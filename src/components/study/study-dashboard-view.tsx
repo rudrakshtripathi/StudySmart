@@ -4,12 +4,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Zap, BookOpen } from "lucide-react";
+import { FileText, Zap, BookOpen, NotebookPen } from "lucide-react";
 import type { SummarizeDocumentOutput } from "@/ai/flows/summarize-document";
 
 interface StudyDashboardViewProps {
   onStartFlashcards: () => void;
   onStartQuiz: () => void;
+  // Add a new prop for handling "Make Notes" action, if it becomes interactive later
+  // onStartNotes?: () => void; 
   hasFlashcards: boolean;
   hasQuiz: boolean;
   topicSummaries: SummarizeDocumentOutput['topicSummaries'] | null;
@@ -18,6 +20,7 @@ interface StudyDashboardViewProps {
 export function StudyDashboardView({ 
   onStartFlashcards, 
   onStartQuiz,
+  // onStartNotes,
   hasFlashcards,
   hasQuiz,
   topicSummaries
@@ -70,7 +73,7 @@ export function StudyDashboardView({
           </CardContent>
         </Card>
 
-        {/* Study Aids Section - takes 1 column on md and up, stacks Flashcards and Quiz vertically */}
+        {/* Study Aids Section - takes 1 column on md and up, stacks Flashcards, Quiz and Notes vertically */}
         <div className="md:col-span-1 space-y-8"> {/* Increased space-y for consistency with gap */}
           <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-pop-in delay-200">
             <CardHeader>
@@ -107,8 +110,32 @@ export function StudyDashboardView({
               </Button>
             </CardFooter>
           </Card>
+
+          <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-pop-in delay-400">
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <NotebookPen className="h-6 w-6 text-primary" />
+                Make Your Own Notes
+              </CardTitle>
+              <CardDescription>Create personalized notes to consolidate your learning.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm">Jot down key points, questions, or ideas related to the document.</p>
+            </CardContent>
+            <CardFooter>
+              {/* This button is a placeholder for now. Functionality to be added later. */}
+              <Button 
+                onClick={() => { /* Placeholder for onStartNotes if implemented */ alert("Feature coming soon!"); }} 
+                className="w-full transition-transform hover:scale-105 active:scale-95"
+                // disabled // Or enable if you want to show the alert
+              >
+                Start Noting
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </div>
   );
 }
+

@@ -19,7 +19,7 @@ import { studyQuotes } from "@/lib/quotes";
 import { IntroductionPage } from "@/components/layout/introduction-page";
 
 
-type AppStep = "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "results";
+type AppStep = "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "results"; // Add "notes" if/when implemented
 
 interface StudyResults {
   type: 'flashcards' | 'quiz';
@@ -195,6 +195,11 @@ export default function StudySmartPage(): JSX.Element {
     setCurrentStep("results");
   };
 
+  // Placeholder for "Make Notes" if it becomes a separate step
+  // const handleStartNotes = () => {
+  //   setCurrentStep("notes"); // Or open a modal, etc.
+  // };
+
   const renderStepContent = () => {
     switch (currentStep) {
       case "introduction":
@@ -221,6 +226,7 @@ export default function StudySmartPage(): JSX.Element {
           <StudyDashboardView
             onStartFlashcards={() => setCurrentStep("flashcards")}
             onStartQuiz={() => setCurrentStep("quiz")}
+            // onStartNotes={handleStartNotes} // Pass if "notes" step/modal is implemented
             hasFlashcards={!!flashcardsData && flashcardsData.length > 0}
             hasQuiz={!!quizData && quizData.length > 0}
             topicSummaries={documentTopicSummaries}
@@ -250,6 +256,8 @@ export default function StudySmartPage(): JSX.Element {
                   onExit={() => setCurrentStep("dashboard")} 
                   onIncrementPoints={handleIncrementGlobalPoints}
                 />;
+      // case "notes": // If "notes" becomes a distinct step
+      //   return <div>Notes Editor (To be implemented)</div>;
       case "results":
         if (!studyResults) {
           setCurrentStep("dashboard"); 
@@ -309,6 +317,7 @@ export default function StudySmartPage(): JSX.Element {
 }
 
   
+
 
 
 
