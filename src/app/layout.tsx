@@ -25,7 +25,7 @@ export default function RootLayout({
 }>): JSX.Element {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} data-ai-hint="app background">
         <AppProviders>
           {children}
         </AppProviders>

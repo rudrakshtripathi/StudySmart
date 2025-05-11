@@ -83,7 +83,7 @@ body {
   body {
     @apply bg-background text-foreground transition-colors duration-300;
   }
-  /* Add a subtle background pulse animation */
+  /* Add a subtle background pulse animation and background image */
   body::before {
     content: "";
     position: fixed;
@@ -91,10 +91,17 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
-    /* animation: subtle-pulse 20s infinite alternate; */
+    z-index: -10; /* Ensure it's behind all content */
+    background-image: url('/logo-background.png'); /* Assuming the image is in public/logo-background.png */
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain; /* Or 'cover' or specific dimensions */
+    opacity: 0.05; /* Adjust for desired transparency, e.g., 0.1 for 10% opacity */
+    /* The original linear gradient is commented out, if needed, combine with background-image or use multiple backgrounds */
     /* background: linear-gradient(45deg, hsl(var(--background)/0.95), hsl(var(--background)/1)); */
+    /* animation: subtle-pulse 20s infinite alternate; */ /* Pulse animation commented out */
   }
+
 
   /* General transition for cards and buttons */
   .card, .btn { /* Assuming .btn is a common class for buttons or use ShadCN's Button component selector */
@@ -197,4 +204,10 @@ body {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
+}
+
+/* Ensure content is above the pseudo-element background */
+main, header, footer {
+  position: relative;
+  z-index: 1;
 }
