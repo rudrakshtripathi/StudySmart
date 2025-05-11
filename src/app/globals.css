@@ -96,7 +96,7 @@ body {
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain; /* Or 'cover' or specific dimensions */
-    opacity: 0.05; /* Adjust for desired transparency, e.g., 0.1 for 10% opacity */
+    opacity: 0.3; /* Adjust for desired transparency, e.g., 0.1 for 10% opacity */
     /* The original linear gradient is commented out, if needed, combine with background-image or use multiple backgrounds */
     /* background: linear-gradient(45deg, hsl(var(--background)/0.95), hsl(var(--background)/1)); */
     /* animation: subtle-pulse 20s infinite alternate; */ /* Pulse animation commented out */
