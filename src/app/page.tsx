@@ -14,6 +14,7 @@ import { summarizeDocument, type SummarizeDocumentOutput } from "@/ai/flows/summ
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PartyPopper, Star } from "lucide-react";
+import { studyQuotes } from "@/lib/quotes";
 
 
 type AppStep = "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "results";
@@ -47,6 +48,7 @@ export default function StudySmartPage(): JSX.Element {
   const [studyResults, setStudyResults] = useState<StudyResults | null>(null);
   const [documentTopicSummaries, setDocumentTopicSummaries] = useState<SummarizeDocumentOutput['topicSummaries'] | null>(null);
   const [currentYear, setCurrentYear] = useState<number | null>(null);
+  const [motivationalQuote, setMotivationalQuote] = useState<string | null>(null);
 
 
   const { toast } = useToast();
@@ -61,6 +63,7 @@ export default function StudySmartPage(): JSX.Element {
     setFlashcardsData(null);
     setQuizData(null);
     setDocumentTopicSummaries(null);
+    setMotivationalQuote(null); 
     
     if (!values.documentFile) {
         toast({ title: "Error", description: "Please upload a PDF document.", variant: "destructive" });
@@ -70,6 +73,10 @@ export default function StudySmartPage(): JSX.Element {
 
     try {
       const dataUri = await fileToDataUri(values.documentFile);
+
+      const randomQuote = studyQuotes[Math.floor(Math.random() * studyQuotes.length)];
+      setMotivationalQuote(randomQuote);
+      
       toast({ title: "Processing PDF...", description: "Extracting text and generating topic summaries." });
       
       const summaryResult = await summarizeDocument({ documentDataUri: dataUri });
@@ -80,7 +87,7 @@ export default function StudySmartPage(): JSX.Element {
         const allBulletPoints = summaryResult.topicSummaries.flatMap(ts => ts.bulletPoints);
         const textForProcessing = allBulletPoints.join("\n"); 
         
-        if (textForProcessing.length < 50) {
+        if (textForProcessing.length < 50) { // Check based on combined bullet points
              toast({ title: "Info", description: "The document content after summarization is very short. Generated study aids might be limited." });
         }
 
@@ -108,10 +115,12 @@ export default function StudySmartPage(): JSX.Element {
           toast({ title: "Info", description: "No quiz questions were generated based on the document summaries." });
         }
         
+        setMotivationalQuote(null); // Clear quote once processing is done
         setCurrentStep("dashboard");
         toast({ title: "Success!", description: "Study aids generated successfully.", className: "bg-accent text-accent-foreground" });
 
       } else {
+        setMotivationalQuote(null); // Clear quote on error too
         toast({ title: "Processing Issue", description: "Could not generate topic summaries from the document. It might be empty, unreadable, or lack clear topics. Please try a different document.", variant: "destructive" });
         setCurrentStep("input");
         return;
@@ -119,6 +128,7 @@ export default function StudySmartPage(): JSX.Element {
 
     } catch (error) {
       console.error("Error generating study aids:", error);
+      setMotivationalQuote(null); // Clear quote on error
       toast({
         title: "Error",
         description: `Failed to generate study aids. ${error instanceof Error ? error.message : 'Please try again.'}`,
@@ -147,7 +157,16 @@ export default function StudySmartPage(): JSX.Element {
       case "input":
         return <DocumentInputForm onSubmit={handleFormSubmit} isLoading={currentStep === "loading"} />;
       case "loading":
-        return <div className="animate-pop-in"><LoadingSpinner size="lg" /></div>;
+        return (
+          <div className="animate-pop-in text-center">
+            <LoadingSpinner size="lg" />
+            {motivationalQuote && (
+              <p className="mt-6 text-lg text-muted-foreground italic animate-fade-in-slide-up delay-500">
+                &ldquo;{motivationalQuote}&rdquo;
+              </p>
+            )}
+          </div>
+        );
       case "dashboard":
         return (
           <StudyDashboardView
