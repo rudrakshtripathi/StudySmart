@@ -3,7 +3,7 @@
 'use server';
 
 /**
- * @fileOverview Summarizes uploaded documents and identify key topics using an AI summarization tool.
+ * @fileOverview Summarizes uploaded documents into topic-wise bullet points using an AI summarization tool.
  *
  * - summarizeDocument - A function that handles the document summarization process.
  * - SummarizeDocumentInput - The input type for the summarizeDocument function.
@@ -23,8 +23,10 @@ const SummarizeDocumentInputSchema = z.object({
 export type SummarizeDocumentInput = z.infer<typeof SummarizeDocumentInputSchema>;
 
 const SummarizeDocumentOutputSchema = z.object({
-  summary: z.string().describe('A concise summary of the document.'),
-  keyTopics: z.array(z.string()).describe('Key topics identified in the document.'),
+  topicSummaries: z.array(z.object({
+    topic: z.string().describe('A key topic identified in the document.'),
+    bulletPoints: z.array(z.string()).describe('A list of 2-5 bullet points summarizing this topic.')
+  })).describe('An array of topic-wise summaries, each with bullet points. Each topic should have at least 2-3 bullet points.')
 });
 export type SummarizeDocumentOutput = z.infer<typeof SummarizeDocumentOutputSchema>;
 
@@ -36,12 +38,15 @@ const prompt = ai.definePrompt({
   name: 'summarizeDocumentPrompt',
   input: {schema: SummarizeDocumentInputSchema},
   output: {schema: SummarizeDocumentOutputSchema},
-  prompt: `You are an expert summarizer, skilled at condensing large documents into concise summaries and identifying key topics.
+  prompt: `You are an expert summarizer. Analyze the following document.
+Identify the key topics discussed in the document.
+For each key topic, provide a concise summary in the form of 2-5 bullet points.
+Ensure the bullet points capture the main ideas of each topic.
 
-  Summarize the following document and identify the key topics. The summary should be no more than 3 paragraphs.
+Document: {{media url=documentDataUri}}
 
-  Document: {{media url=documentDataUri}}
-  `,
+Output the result as a JSON object matching the provided schema. If the document is too short or lacks distinct topics, return an empty array for topicSummaries.
+`,
 });
 
 const summarizeDocumentFlow = ai.defineFlow(
@@ -55,3 +60,4 @@ const summarizeDocumentFlow = ai.defineFlow(
     return output!;
   }
 );
+

@@ -46,8 +46,7 @@ export default function StudySmartPage(): JSX.Element {
   const [flashcardsData, setFlashcardsData] = useState<GenerateFlashcardsOutput['flashcards'] | null>(null);
   const [quizData, setQuizData] = useState<GenerateMcqQuizOutput['quiz'] | null>(null);
   const [studyResults, setStudyResults] = useState<StudyResults | null>(null);
-  const [documentSummary, setDocumentSummary] = useState<string | null>(null);
-  const [keyTopics, setKeyTopics] = useState<string[] | null>(null);
+  const [documentTopicSummaries, setDocumentTopicSummaries] = useState<SummarizeDocumentOutput['topicSummaries'] | null>(null);
   const [currentYear, setCurrentYear] = useState<number | null>(null);
 
 
@@ -62,67 +61,64 @@ export default function StudySmartPage(): JSX.Element {
     // Reset previous data
     setFlashcardsData(null);
     setQuizData(null);
-    setDocumentSummary(null);
-    setKeyTopics(null);
+    setDocumentTopicSummaries(null);
     
-    let textForProcessing: string = "";
-    let topicForProcessing: string = values.topic;
+    if (!values.documentFile) {
+        toast({ title: "Error", description: "Please upload a PDF document.", variant: "destructive" });
+        setCurrentStep("input");
+        return;
+    }
 
     try {
-      if (values.documentFile) {
-        const dataUri = await fileToDataUri(values.documentFile);
-        toast({ title: "Processing PDF...", description: "Extracting text and summarizing." });
-        const summaryResult = await summarizeDocument({ documentDataUri: dataUri });
-        textForProcessing = summaryResult.summary;
-        setDocumentSummary(summaryResult.summary);
-        if (summaryResult.keyTopics && summaryResult.keyTopics.length > 0) {
-          topicForProcessing = values.topic || summaryResult.keyTopics[0]; // Prioritize user topic
-          setKeyTopics(summaryResult.keyTopics);
-        } else {
-          setKeyTopics([values.topic]); // Fallback to user-provided topic if AI doesn't return any
+      const dataUri = await fileToDataUri(values.documentFile);
+      toast({ title: "Processing PDF...", description: "Extracting text and generating topic summaries." });
+      
+      const summaryResult = await summarizeDocument({ documentDataUri: dataUri });
+
+      if (summaryResult.topicSummaries && summaryResult.topicSummaries.length > 0) {
+        setDocumentTopicSummaries(summaryResult.topicSummaries);
+
+        const allBulletPoints = summaryResult.topicSummaries.flatMap(ts => ts.bulletPoints);
+        // Ensure each bullet point starts appropriately if not already, or just join.
+        // For simplicity, join with newline and rely on LLM to have formatted points well.
+        const textForProcessing = allBulletPoints.join("\n"); 
+        
+        if (textForProcessing.length < 50) {
+             toast({ title: "Info", description: "The document content after summarization is very short. Generated study aids might be limited." });
         }
-        toast({ title: "PDF Processed", description: "Summary and key topics extracted." });
-      } else if (values.documentText) {
-        textForProcessing = values.documentText;
-        // For plain text input, we can show a snippet as "summary" and use the provided topic.
-        setDocumentSummary(textForProcessing.length > 300 ? textForProcessing.substring(0, 297) + "..." : textForProcessing);
-        setKeyTopics([values.topic]);
+
+        const topicForFlashcards = summaryResult.topicSummaries[0]?.topic || "Document Overview";
+
+        toast({ title: "PDF Processed", description: "Topic summaries extracted." });
+        toast({ title: "Generating Study Aids...", description: "Please wait a moment." });
+
+        const [flashcardsResult, quizResult] = await Promise.all([
+          generateFlashcards({ documentText: textForProcessing, topic: topicForFlashcards }),
+          generateMcqQuiz({ text: textForProcessing, numQuestions: 5 })
+        ]);
+
+        if (flashcardsResult.flashcards && flashcardsResult.flashcards.length > 0) {
+          setFlashcardsData(flashcardsResult.flashcards);
+        } else {
+          setFlashcardsData(null);
+          toast({ title: "Info", description: "No flashcards were generated based on the document summaries." });
+        }
+        
+        if (quizResult.quiz && quizResult.quiz.length > 0) {
+          setQuizData(quizResult.quiz);
+        } else {
+          setQuizData(null);
+          toast({ title: "Info", description: "No quiz questions were generated based on the document summaries." });
+        }
+        
+        setCurrentStep("dashboard");
+        toast({ title: "Success!", description: "Study aids generated successfully.", className: "bg-accent text-accent-foreground" });
+
       } else {
-        // This case should be prevented by form validation
-        toast({ title: "Error", description: "No document content provided.", variant: "destructive" });
+        toast({ title: "Processing Issue", description: "Could not generate topic summaries from the document. It might be empty, unreadable, or lack clear topics. Please try a different document.", variant: "destructive" });
         setCurrentStep("input");
         return;
       }
-
-      if (!textForProcessing) {
-          toast({ title: "Error", description: "Could not extract text for processing. The document might be empty or unreadable.", variant: "destructive" });
-          setCurrentStep("input");
-          return;
-      }
-      
-      toast({ title: "Generating Study Aids...", description: "Please wait a moment." });
-      const [flashcardsResult, quizResult] = await Promise.all([
-        generateFlashcards({ documentText: textForProcessing, topic: topicForProcessing }),
-        generateMcqQuiz({ text: textForProcessing, numQuestions: 5 })
-      ]);
-
-      if (flashcardsResult.flashcards && flashcardsResult.flashcards.length > 0) {
-        setFlashcardsData(flashcardsResult.flashcards);
-      } else {
-        setFlashcardsData(null);
-        // Do not toast here if summary was successful, as user might only want summary
-        if (!values.documentFile) toast({ title: "Info", description: "No flashcards were generated for the provided text." });
-      }
-      
-      if (quizResult.quiz && quizResult.quiz.length > 0) {
-        setQuizData(quizResult.quiz);
-      } else {
-        setQuizData(null);
-         if (!values.documentFile) toast({ title: "Info", description: "No quiz questions were generated for the provided text." });
-      }
-      
-      setCurrentStep("dashboard");
-      toast({ title: "Success!", description: "Study aids generated successfully.", className: "bg-accent text-accent-foreground" });
 
     } catch (error) {
       console.error("Error generating study aids:", error);
@@ -150,7 +146,7 @@ export default function StudySmartPage(): JSX.Element {
   const renderStepContent = () => {
     switch (currentStep) {
       case "input":
-        return <DocumentInputForm onSubmit={handleFormSubmit} isLoading={false} />; // isLoading is implicitly managed by currentStep
+        return <DocumentInputForm onSubmit={handleFormSubmit} isLoading={currentStep === "loading"} />;
       case "loading":
         return <LoadingSpinner size="lg" />;
       case "dashboard":
@@ -160,8 +156,7 @@ export default function StudySmartPage(): JSX.Element {
             onStartQuiz={() => setCurrentStep("quiz")}
             hasFlashcards={!!flashcardsData && flashcardsData.length > 0}
             hasQuiz={!!quizData && quizData.length > 0}
-            documentSummary={documentSummary}
-            keyTopics={keyTopics}
+            topicSummaries={documentTopicSummaries}
           />
         );
       case "flashcards":
@@ -225,9 +220,8 @@ export default function StudySmartPage(): JSX.Element {
         {renderStepContent()}
       </main>
       <footer className="py-4 text-center text-muted-foreground text-sm">
-        {currentYear ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
+        {currentYear !== null ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
       </footer>
     </div>
   );
 }
-

@@ -1,17 +1,18 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Zap, BookOpen } from "lucide-react";
+import type { SummarizeDocumentOutput } from "@/ai/flows/summarize-document";
 
 interface StudyDashboardViewProps {
   onStartFlashcards: () => void;
   onStartQuiz: () => void;
   hasFlashcards: boolean;
   hasQuiz: boolean;
-  documentSummary: string | null;
-  keyTopics: string[] | null;
+  topicSummaries: SummarizeDocumentOutput['topicSummaries'] | null;
 }
 
 export function StudyDashboardView({ 
@@ -19,8 +20,7 @@ export function StudyDashboardView({
   onStartQuiz,
   hasFlashcards,
   hasQuiz,
-  documentSummary,
-  keyTopics
+  topicSummaries
 }: StudyDashboardViewProps): JSX.Element {
   return (
     <div className="space-y-8 w-full max-w-3xl mx-auto">
@@ -28,43 +28,41 @@ export function StudyDashboardView({
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
             <FileText className="h-7 w-7 text-primary" />
-            Document Summary & Topics
+            Document Topic Summaries
           </CardTitle>
-          {documentSummary ? (
+          {topicSummaries && topicSummaries.length > 0 ? (
             <CardDescription>
-              Summary and key topics from your document.
+              Key topics and their bullet-point summaries from your document.
             </CardDescription>
           ) : (
             <CardDescription>
-              Provide document text or upload a PDF to see its summary and key topics here.
+              Upload a PDF document to see its topic summaries here.
             </CardDescription>
           )}
         </CardHeader>
         <CardContent>
-          {documentSummary ? (
-            <ScrollArea className="h-[200px] pr-4">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">Summary:</h3>
-                  <p className="text-foreground/90 whitespace-pre-wrap text-sm">
-                    {documentSummary}
-                  </p>
-                </div>
-                {keyTopics && keyTopics.length > 0 && (
-                  <div>
-                    <h3 className="font-semibold text-lg mb-1">Key Topics:</h3>
-                    <ul className="list-disc list-inside space-y-1">
-                      {keyTopics.map((topic, index) => (
-                        <li key={index} className="text-foreground/90 text-sm">{topic}</li>
-                      ))}
-                    </ul>
+          {topicSummaries && topicSummaries.length > 0 ? (
+            <ScrollArea className="h-[250px] pr-4">
+              <div className="space-y-6">
+                {topicSummaries.map((item, index) => (
+                  <div key={index}>
+                    <h3 className="font-semibold text-lg mb-2 text-primary">{item.topic}</h3>
+                    {item.bulletPoints && item.bulletPoints.length > 0 ? (
+                      <ul className="list-disc list-inside space-y-1 pl-4">
+                        {item.bulletPoints.map((point, pIndex) => (
+                          <li key={pIndex} className="text-foreground/90 text-sm">{point}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground text-sm italic pl-4">No specific bullet points provided for this topic.</p>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
             </ScrollArea>
           ) : (
             <p className="text-muted-foreground">
-              The summary and key topics will appear here after processing your input.
+              Topic-wise summaries will appear here after processing your PDF.
             </p>
           )}
         </CardContent>
@@ -80,7 +78,7 @@ export function StudyDashboardView({
             <CardDescription>Reinforce your learning with interactive flashcards.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm">Review key terms and concepts from your document.</p>
+            <p className="text-sm">Review key terms and concepts based on the document summaries.</p>
           </CardContent>
           <CardFooter>
             <Button onClick={onStartFlashcards} className="w-full" disabled={!hasFlashcards}>
@@ -98,7 +96,7 @@ export function StudyDashboardView({
             <CardDescription>Test your understanding with a multiple-choice quiz.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm">Challenge yourself and identify areas for improvement.</p>
+            <p className="text-sm">Challenge yourself based on the document summaries.</p>
           </CardContent>
           <CardFooter>
             <Button onClick={onStartQuiz} className="w-full" disabled={!hasQuiz}>
