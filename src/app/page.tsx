@@ -65,19 +65,20 @@ export default function StudySmartPage(): JSX.Element {
       setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
       
       // Start interval to change quote every 3 seconds
+      // Clear any existing interval before starting a new one
+      if (quoteIntervalRef.current) {
+        clearInterval(quoteIntervalRef.current);
+      }
       quoteIntervalRef.current = setInterval(() => {
         setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
       }, 3000);
     } else {
-      // Clear interval if currentStep is not "loading"
+      // Clear interval and quote if currentStep is not "loading"
       if (quoteIntervalRef.current) {
         clearInterval(quoteIntervalRef.current);
         quoteIntervalRef.current = null;
       }
-      // Ensure quote is cleared if not loading (also handled in handleFormSubmit)
-      if (motivationalQuote !== null) {
-        setMotivationalQuote(null);
-      }
+      setMotivationalQuote(null);
     }
 
     // Cleanup function for when component unmounts or currentStep changes
@@ -87,20 +88,19 @@ export default function StudySmartPage(): JSX.Element {
         quoteIntervalRef.current = null;
       }
     };
-  }, [currentStep, motivationalQuote]); // Dependency array includes currentStep and motivationalQuote
+  }, [currentStep]); // Only depend on currentStep to avoid infinite loop
 
   const handleFormSubmit = async (values: DocumentInputFormValues) => {
     // Reset previous data
     setFlashcardsData(null);
     setQuizData(null);
     setDocumentTopicSummaries(null);
-    // Motivational quote handling is now primarily in useEffect based on currentStep
-
-    setCurrentStep("loading"); // This will trigger the useEffect to start displaying quotes
+    
+    setCurrentStep("loading"); 
     
     if (!values.documentFile) {
         toast({ title: "Error", description: "Please upload a PDF document.", variant: "destructive" });
-        setCurrentStep("input"); // This will trigger useEffect to clear quotes
+        setCurrentStep("input"); 
         return;
     }
 
@@ -145,30 +145,31 @@ export default function StudySmartPage(): JSX.Element {
           toast({ title: "Info", description: "No quiz questions were generated based on the document summaries." });
         }
         
-        setCurrentStep("dashboard"); // This will trigger useEffect to clear quotes
+        setCurrentStep("dashboard"); 
         toast({ title: "Success!", description: "Study aids generated successfully.", className: "bg-accent text-accent-foreground" });
 
       } else {
-        setCurrentStep("input"); // This will trigger useEffect to clear quotes
+        setCurrentStep("input"); 
         toast({ title: "Processing Issue", description: "Could not generate topic summaries from the document. It might be empty, unreadable, or lack clear topics. Please try a different document.", variant: "destructive" });
         return;
       }
 
     } catch (error) {
       console.error("Error generating study aids:", error);
-      setCurrentStep("input"); // This will trigger useEffect to clear quotes
+      setCurrentStep("input"); 
       toast({
         title: "Error",
         description: `Failed to generate study aids. ${error instanceof Error ? error.message : 'Please try again.'}`,
         variant: "destructive",
       });
     } finally {
-        // Ensure quote is cleared if it hasn't been by a step change already
+        // Defensive cleanup for interval, though useEffect should handle it
+        // when currentStep changes.
         if (quoteIntervalRef.current) {
             clearInterval(quoteIntervalRef.current);
             quoteIntervalRef.current = null;
         }
-        setMotivationalQuote(null);
+        // setMotivationalQuote(null); // Removed: useEffect now manages this based on currentStep
     }
   };
 
@@ -292,3 +293,4 @@ export default function StudySmartPage(): JSX.Element {
 }
 
   
+
