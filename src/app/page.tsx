@@ -297,12 +297,16 @@ export default function StudySmartPage(): JSX.Element {
         </div>
       </main>
       <footer className="py-4 text-center text-muted-foreground text-sm animate-fade-in-slide-up">
-        {currentYear !== null ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
+        <p>
+          {currentYear !== null ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
+        </p>
+        <p className="mt-1">Created by Rudraksh Tripathi</p>
       </footer>
     </div>
   );
 }
 
   
+
 
 
