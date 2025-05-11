@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AppHeader } from "@/components/layout/app-header";
 import { DocumentInputForm, type DocumentInputFormValues } from "@/components/study/document-input-form";
 import { StudyDashboardView } from "@/components/study/study-dashboard-view";
@@ -47,9 +48,14 @@ export default function StudySmartPage(): JSX.Element {
   const [studyResults, setStudyResults] = useState<StudyResults | null>(null);
   const [documentSummary, setDocumentSummary] = useState<string | null>(null);
   const [keyTopics, setKeyTopics] = useState<string[] | null>(null);
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
 
 
   const { toast } = useToast();
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   const handleFormSubmit = async (values: DocumentInputFormValues) => {
     setCurrentStep("loading");
@@ -219,8 +225,9 @@ export default function StudySmartPage(): JSX.Element {
         {renderStepContent()}
       </main>
       <footer className="py-4 text-center text-muted-foreground text-sm">
-        StudySmart &copy; {new Date().getFullYear()} - Your AI Learning Companion
+        {currentYear ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
       </footer>
     </div>
   );
 }
+
