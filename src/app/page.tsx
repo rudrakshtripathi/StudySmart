@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AppHeader } from "@/components/layout/app-header";
 import { DocumentInputForm, type DocumentInputFormValues } from "@/components/study/document-input-form";
 import { StudyDashboardView } from "@/components/study/study-dashboard-view";
@@ -49,6 +50,7 @@ export default function StudySmartPage(): JSX.Element {
   const [documentTopicSummaries, setDocumentTopicSummaries] = useState<SummarizeDocumentOutput['topicSummaries'] | null>(null);
   const [currentYear, setCurrentYear] = useState<number | null>(null);
   const [motivationalQuote, setMotivationalQuote] = useState<string | null>(null);
+  const quoteIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 
   const { toast } = useToast();
@@ -57,25 +59,54 @@ export default function StudySmartPage(): JSX.Element {
     setCurrentYear(new Date().getFullYear());
   }, []);
 
+  useEffect(() => {
+    if (currentStep === "loading") {
+      // Set initial quote immediately
+      setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
+      
+      // Start interval to change quote every 2 seconds
+      quoteIntervalRef.current = setInterval(() => {
+        setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
+      }, 2000);
+    } else {
+      // Clear interval if currentStep is not "loading"
+      if (quoteIntervalRef.current) {
+        clearInterval(quoteIntervalRef.current);
+        quoteIntervalRef.current = null;
+      }
+      // Ensure quote is cleared if not loading (also handled in handleFormSubmit)
+      if (motivationalQuote !== null) {
+        setMotivationalQuote(null);
+      }
+    }
+
+    // Cleanup function for when component unmounts or currentStep changes
+    return () => {
+      if (quoteIntervalRef.current) {
+        clearInterval(quoteIntervalRef.current);
+        quoteIntervalRef.current = null;
+      }
+    };
+  }, [currentStep]); // Dependency array includes currentStep
+
   const handleFormSubmit = async (values: DocumentInputFormValues) => {
-    setCurrentStep("loading");
     // Reset previous data
     setFlashcardsData(null);
     setQuizData(null);
     setDocumentTopicSummaries(null);
-    setMotivationalQuote(null); 
+    // Motivational quote handling is now primarily in useEffect based on currentStep
+    // setMotivationalQuote(null); // Initial clear, then useEffect takes over
+
+    setCurrentStep("loading"); // This will trigger the useEffect to start displaying quotes
     
     if (!values.documentFile) {
         toast({ title: "Error", description: "Please upload a PDF document.", variant: "destructive" });
-        setCurrentStep("input");
+        setCurrentStep("input"); // This will trigger useEffect to clear quotes
         return;
     }
 
     try {
       const dataUri = await fileToDataUri(values.documentFile);
-
-      const randomQuote = studyQuotes[Math.floor(Math.random() * studyQuotes.length)];
-      setMotivationalQuote(randomQuote);
       
       toast({ title: "Processing PDF...", description: "Extracting text and generating topic summaries." });
       
@@ -87,7 +118,7 @@ export default function StudySmartPage(): JSX.Element {
         const allBulletPoints = summaryResult.topicSummaries.flatMap(ts => ts.bulletPoints);
         const textForProcessing = allBulletPoints.join("\n"); 
         
-        if (textForProcessing.length < 50) { // Check based on combined bullet points
+        if (textForProcessing.length < 50) { 
              toast({ title: "Info", description: "The document content after summarization is very short. Generated study aids might be limited." });
         }
 
@@ -115,26 +146,30 @@ export default function StudySmartPage(): JSX.Element {
           toast({ title: "Info", description: "No quiz questions were generated based on the document summaries." });
         }
         
-        setMotivationalQuote(null); // Clear quote once processing is done
-        setCurrentStep("dashboard");
+        setCurrentStep("dashboard"); // This will trigger useEffect to clear quotes
         toast({ title: "Success!", description: "Study aids generated successfully.", className: "bg-accent text-accent-foreground" });
 
       } else {
-        setMotivationalQuote(null); // Clear quote on error too
+        setCurrentStep("input"); // This will trigger useEffect to clear quotes
         toast({ title: "Processing Issue", description: "Could not generate topic summaries from the document. It might be empty, unreadable, or lack clear topics. Please try a different document.", variant: "destructive" });
-        setCurrentStep("input");
         return;
       }
 
     } catch (error) {
       console.error("Error generating study aids:", error);
-      setMotivationalQuote(null); // Clear quote on error
+      setCurrentStep("input"); // This will trigger useEffect to clear quotes
       toast({
         title: "Error",
         description: `Failed to generate study aids. ${error instanceof Error ? error.message : 'Please try again.'}`,
         variant: "destructive",
       });
-      setCurrentStep("input");
+    } finally {
+        // Ensure quote is cleared if it hasn't been by a step change already
+        if (quoteIntervalRef.current) {
+            clearInterval(quoteIntervalRef.current);
+            quoteIntervalRef.current = null;
+        }
+        setMotivationalQuote(null);
     }
   };
 
@@ -161,10 +196,11 @@ export default function StudySmartPage(): JSX.Element {
           <div className="animate-pop-in text-center">
             <LoadingSpinner size="lg" />
             {motivationalQuote && (
-              <p className="mt-6 text-lg text-muted-foreground italic animate-fade-in-slide-up delay-500">
+              <p className="mt-6 text-lg text-muted-foreground italic animate-fade-in-slide-up delay-500 min-h-[50px] flex items-center justify-center">
                 &ldquo;{motivationalQuote}&rdquo;
               </p>
             )}
+             {!motivationalQuote && <div className="mt-6 min-h-[50px]"></div>} {/* Placeholder for consistent layout */}
           </div>
         );
       case "dashboard":
@@ -255,3 +291,5 @@ export default function StudySmartPage(): JSX.Element {
     </div>
   );
 }
+
+  
