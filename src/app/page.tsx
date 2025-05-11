@@ -64,10 +64,10 @@ export default function StudySmartPage(): JSX.Element {
       // Set initial quote immediately
       setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
       
-      // Start interval to change quote every 2 seconds
+      // Start interval to change quote every 3 seconds
       quoteIntervalRef.current = setInterval(() => {
         setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
-      }, 2000);
+      }, 3000);
     } else {
       // Clear interval if currentStep is not "loading"
       if (quoteIntervalRef.current) {
@@ -87,7 +87,7 @@ export default function StudySmartPage(): JSX.Element {
         quoteIntervalRef.current = null;
       }
     };
-  }, [currentStep]); // Dependency array includes currentStep
+  }, [currentStep, motivationalQuote]); // Dependency array includes currentStep and motivationalQuote
 
   const handleFormSubmit = async (values: DocumentInputFormValues) => {
     // Reset previous data
@@ -95,7 +95,6 @@ export default function StudySmartPage(): JSX.Element {
     setQuizData(null);
     setDocumentTopicSummaries(null);
     // Motivational quote handling is now primarily in useEffect based on currentStep
-    // setMotivationalQuote(null); // Initial clear, then useEffect takes over
 
     setCurrentStep("loading"); // This will trigger the useEffect to start displaying quotes
     
