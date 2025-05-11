@@ -49,23 +49,9 @@ export function QuizPlayer({ quiz, onComplete, onExit }: QuizPlayerProps): JSX.E
     if (currentIndex < quiz.length - 1) {
       setCurrentIndex(prevIndex => prevIndex + 1);
     } else {
-      // const correctCount = quiz.reduce((acc, q, index) => {
-        // This needs a way to track which answers were correct.
-        // For now, let's assume `isCorrect` reflects the last answer's status
-        // This part is tricky without storing all answers. Let's simplify.
-        // The points variable tracks earned points.
-        // We need a better way to count correct answers for the summary.
-        // Let's pass only points for now. A more robust solution would store all responses.
-        // For this version: we can count based on which questions resulted in point increase
-        // but that's also indirect.
-        // Let's calculate correct answers by re-evaluating (not ideal but works for this scope)
-        // Or, even better, maintain an array of results.
-        // For simplicity, let's not pass correctAnswers if it complicates this component too much.
-        // The onComplete can be simplified for now.
-        // onComplete(points, correctAnswersThisSession, totalAnswers)
-        // This means points IS the correct answers count * 10.
-         onComplete(points, points / 10, quiz.length);
-      // }
+      // The onComplete callback expects points, correct answers, and total answers.
+      // Points are already tracked. Correct answers can be derived from points / 10.
+      onComplete(points, points / 10, quiz.length);
     }
   };
 
