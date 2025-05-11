@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import {Geist, Geist_Mono} from 'next/font/google';
 import './globals.css';
@@ -24,8 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>): JSX.Element {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} data-ai-hint="app background">
+    <html lang="en" suppressHydrationWarning>
+      <body 
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`} 
+        data-ai-hint="app background"
+        suppressHydrationWarning={true}
+      >
         <AppProviders>
           {children}
         </AppProviders>
@@ -33,3 +38,4 @@ export default function RootLayout({
     </html>
   );
 }
+
