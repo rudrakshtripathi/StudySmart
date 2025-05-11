@@ -23,8 +23,8 @@ export function StudyDashboardView({
   topicSummaries
 }: StudyDashboardViewProps): JSX.Element {
   return (
-    <div className="space-y-8 w-full max-w-3xl mx-auto">
-      <Card className="shadow-lg">
+    <div className="space-y-8 w-full max-w-3xl mx-auto animate-fade-in-slide-up">
+      <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 animate-pop-in delay-100">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2">
             <FileText className="h-7 w-7 text-primary" />
@@ -45,12 +45,12 @@ export function StudyDashboardView({
             <ScrollArea className="h-[250px] pr-4">
               <div className="space-y-6">
                 {topicSummaries.map((item, index) => (
-                  <div key={index}>
+                  <div key={index} className="animate-fade-in-slide-up" style={{animationDelay: `${index * 100}ms`}}>
                     <h3 className="font-semibold text-lg mb-2 text-primary">{item.topic}</h3>
                     {item.bulletPoints && item.bulletPoints.length > 0 ? (
                       <ul className="list-disc list-inside space-y-1 pl-4">
                         {item.bulletPoints.map((point, pIndex) => (
-                          <li key={pIndex} className="text-foreground/90 text-sm">{point}</li>
+                          <li key={pIndex} className="text-foreground/90 text-sm animate-fade-in" style={{animationDelay: `${(index * 100) + (pIndex * 50)}ms`}}>{point}</li>
                         ))}
                       </ul>
                     ) : (
@@ -69,7 +69,7 @@ export function StudyDashboardView({
       </Card>
 
       <div className="grid md:grid-cols-2 gap-6">
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-pop-in delay-200">
           <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
               <BookOpen className="h-6 w-6 text-primary" />
@@ -81,13 +81,13 @@ export function StudyDashboardView({
             <p className="text-sm">Review key terms and concepts based on the document summaries.</p>
           </CardContent>
           <CardFooter>
-            <Button onClick={onStartFlashcards} className="w-full" disabled={!hasFlashcards}>
+            <Button onClick={onStartFlashcards} className="w-full transition-transform hover:scale-105 active:scale-95" disabled={!hasFlashcards}>
               {hasFlashcards ? "Study Flashcards" : "No Flashcards Generated"}
             </Button>
           </CardFooter>
         </Card>
 
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-pop-in delay-300">
           <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
               <Zap className="h-6 w-6 text-primary" />
@@ -99,7 +99,7 @@ export function StudyDashboardView({
             <p className="text-sm">Challenge yourself based on the document summaries.</p>
           </CardContent>
           <CardFooter>
-            <Button onClick={onStartQuiz} className="w-full" disabled={!hasQuiz}>
+            <Button onClick={onStartQuiz} className="w-full transition-transform hover:scale-105 active:scale-95" disabled={!hasQuiz}>
                {hasQuiz ? "Take Quiz" : "No Quiz Generated"}
             </Button>
           </CardFooter>

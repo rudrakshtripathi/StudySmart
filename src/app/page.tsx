@@ -79,8 +79,6 @@ export default function StudySmartPage(): JSX.Element {
         setDocumentTopicSummaries(summaryResult.topicSummaries);
 
         const allBulletPoints = summaryResult.topicSummaries.flatMap(ts => ts.bulletPoints);
-        // Ensure each bullet point starts appropriately if not already, or just join.
-        // For simplicity, join with newline and rely on LLM to have formatted points well.
         const textForProcessing = allBulletPoints.join("\n"); 
         
         if (textForProcessing.length < 50) {
@@ -148,7 +146,7 @@ export default function StudySmartPage(): JSX.Element {
       case "input":
         return <DocumentInputForm onSubmit={handleFormSubmit} isLoading={currentStep === "loading"} />;
       case "loading":
-        return <LoadingSpinner size="lg" />;
+        return <div className="animate-pop-in"><LoadingSpinner size="lg" /></div>;
       case "dashboard":
         return (
           <StudyDashboardView
@@ -179,10 +177,10 @@ export default function StudySmartPage(): JSX.Element {
           return null;
         }
         return (
-          <Card className="w-full max-w-md mx-auto text-center shadow-xl">
+          <Card className="w-full max-w-md mx-auto text-center shadow-xl animate-pop-in">
             <CardHeader>
               <CardTitle className="text-3xl font-bold flex items-center justify-center gap-2">
-                <PartyPopper className="h-10 w-10 text-accent" />
+                <PartyPopper className="h-10 w-10 text-accent animate-pulse-glow" />
                 Session Complete!
               </CardTitle>
               <CardDescription className="text-lg">
@@ -197,12 +195,12 @@ export default function StudySmartPage(): JSX.Element {
                 Points earned this session: <strong className="text-accent">{studyResults.pointsEarned}</strong>
               </div>
               <div className="text-2xl font-semibold flex items-center justify-center gap-2">
-                <Star className="h-7 w-7 text-yellow-400 fill-yellow-400" />
+                <Star className="h-7 w-7 text-yellow-400 fill-yellow-400 animate-pulse-glow delay-500" />
                 Total Points: <strong className="text-primary">{points}</strong>
               </div>
             </CardContent>
             <CardFooter className="flex justify-center">
-              <Button onClick={() => setCurrentStep("dashboard")} size="lg">
+              <Button onClick={() => setCurrentStep("dashboard")} size="lg" className="animate-pulse-glow delay-1000">
                 Back to Dashboard
               </Button>
             </CardFooter>
@@ -217,9 +215,11 @@ export default function StudySmartPage(): JSX.Element {
     <div className="min-h-screen flex flex-col bg-background">
       <AppHeader points={points} />
       <main className="flex-grow container mx-auto px-4 py-8 flex justify-center items-center">
-        {renderStepContent()}
+        <div key={currentStep} className="w-full animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out">
+          {renderStepContent()}
+        </div>
       </main>
-      <footer className="py-4 text-center text-muted-foreground text-sm">
+      <footer className="py-4 text-center text-muted-foreground text-sm animate-fade-in-slide-up">
         {currentYear !== null ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
       </footer>
     </div>

@@ -43,7 +43,7 @@ export function DocumentInputForm({ onSubmit, isLoading }: DocumentInputFormProp
   });
 
   return (
-    <Card className="w-full max-w-xl mx-auto shadow-xl">
+    <Card className="w-full max-w-xl mx-auto shadow-xl animate-pop-in">
       <CardHeader>
         <CardTitle className="text-2xl flex items-center gap-2">
           <Brain className="h-7 w-7 text-primary" />
@@ -67,7 +67,7 @@ export function DocumentInputForm({ onSubmit, isLoading }: DocumentInputFormProp
                       type="file"
                       accept="application/pdf"
                       onChange={(e) => onChange(e.target.files?.[0] ?? undefined)}
-                      className="file:text-primary file:font-semibold hover:file:bg-primary/10"
+                      className="file:text-primary file:font-semibold hover:file:bg-primary/10 transition-shadow focus:shadow-lg focus:ring-2 focus:ring-primary/50"
                       {...restField}
                       data-ai-hint="pdf document"
                     />
@@ -76,7 +76,7 @@ export function DocumentInputForm({ onSubmit, isLoading }: DocumentInputFormProp
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full text-lg py-6" disabled={isLoading}>
+            <Button type="submit" className="w-full text-lg py-6 transition-transform hover:scale-105 active:scale-95" disabled={isLoading}>
               {isLoading ? "Generating..." : "Generate Study Aids"}
             </Button>
           </form>

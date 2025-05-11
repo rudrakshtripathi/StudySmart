@@ -81,8 +81,29 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
+  /* Add a subtle background pulse animation */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    /* animation: subtle-pulse 20s infinite alternate; */
+    /* background: linear-gradient(45deg, hsl(var(--background)/0.95), hsl(var(--background)/1)); */
+  }
+
+  /* General transition for cards and buttons */
+  .card, .btn { /* Assuming .btn is a common class for buttons or use ShadCN's Button component selector */
+    @apply transition-all duration-300 ease-out;
+  }
+  .card:hover {
+     @apply shadow-2xl transform scale-[1.02];
+  }
+
 }
 
 @layer utilities {
@@ -98,4 +119,82 @@ body {
   .perspective-1000 {
     perspective: 1000px;
   }
+  .perspective-1500 {
+    perspective: 1500px;
+  }
+
+  .animate-pop-in {
+    animation: pop-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  .animate-fade-in-slide-up {
+     animation: fade-in-slide-up 0.6s ease-out forwards;
+  }
+  .animate-flashcard-flip {
+    animation: flashcard-flip-anim 0.7s ease-in-out forwards;
+  }
+   .animate-question-slide-in {
+    animation: question-slide-in 0.5s ease-out forwards;
+  }
+  .animate-option-select {
+    animation: option-select-pulse 0.3s ease-out;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fade-in-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtle-pulse {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes flashcard-flip-anim {
+  from {
+    transform: rotateY(0deg) scale(1);
+  }
+  to {
+    transform: rotateY(180deg) scale(1.05); /* Slight scale for emphasis */
+  }
+}
+
+@keyframes question-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes option-select-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
