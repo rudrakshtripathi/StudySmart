@@ -16,9 +16,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PartyPopper, Star } from "lucide-react";
 import { studyQuotes } from "@/lib/quotes";
+import { IntroductionPage } from "@/components/layout/introduction-page";
 
 
-type AppStep = "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "results";
+type AppStep = "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "results";
 
 interface StudyResults {
   type: 'flashcards' | 'quiz';
@@ -41,8 +42,9 @@ const fileToDataUri = (file: File): Promise<string> => {
 };
 
 export default function StudySmartPage(): JSX.Element {
-  const [currentStep, setCurrentStep] = useState<AppStep>("input");
+  const [currentStep, setCurrentStep] = useState<AppStep>("introduction");
   const [points, setPoints] = useState(0);
+  const [userName, setUserName] = useState<string | null>(null);
   
   const [flashcardsData, setFlashcardsData] = useState<GenerateFlashcardsOutput['flashcards'] | null>(null);
   const [quizData, setQuizData] = useState<GenerateMcqQuizOutput['quiz'] | null>(null);
@@ -88,7 +90,17 @@ export default function StudySmartPage(): JSX.Element {
         quoteIntervalRef.current = null;
       }
     };
-  }, [currentStep]); // Only depend on currentStep to avoid infinite loop
+  }, [currentStep]);
+
+  const handleIntroductionSubmit = (name: string) => {
+    if (name.trim()) {
+      setUserName(name.trim());
+      setCurrentStep("input");
+      toast({ title: `Welcome, ${name.trim()}!`, description: "Let's get started with your studies." });
+    } else {
+      toast({ title: "Oops!", description: "Please enter your name to continue.", variant: "destructive" });
+    }
+  };
 
   const handleFormSubmit = async (values: DocumentInputFormValues) => {
     // Reset previous data
@@ -163,13 +175,10 @@ export default function StudySmartPage(): JSX.Element {
         variant: "destructive",
       });
     } finally {
-        // Defensive cleanup for interval, though useEffect should handle it
-        // when currentStep changes.
         if (quoteIntervalRef.current) {
             clearInterval(quoteIntervalRef.current);
             quoteIntervalRef.current = null;
         }
-        // setMotivationalQuote(null); // Removed: useEffect now manages this based on currentStep
     }
   };
 
@@ -189,6 +198,8 @@ export default function StudySmartPage(): JSX.Element {
 
   const renderStepContent = () => {
     switch (currentStep) {
+      case "introduction":
+        return <IntroductionPage onSubmit={handleIntroductionSubmit} />;
       case "input":
         return <DocumentInputForm onSubmit={handleFormSubmit} isLoading={currentStep === "loading"} />;
       case "loading":
@@ -279,7 +290,7 @@ export default function StudySmartPage(): JSX.Element {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <AppHeader points={points} />
+      <AppHeader points={points} userName={userName} />
       <main className="flex-grow container mx-auto px-4 py-8 flex justify-center items-center">
         <div key={currentStep} className="w-full animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out">
           {renderStepContent()}
@@ -293,4 +304,5 @@ export default function StudySmartPage(): JSX.Element {
 }
 
   
+
 
