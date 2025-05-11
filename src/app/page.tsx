@@ -52,6 +52,7 @@ export default function StudySmartPage(): JSX.Element {
   const [documentTopicSummaries, setDocumentTopicSummaries] = useState<SummarizeDocumentOutput['topicSummaries'] | null>(null);
   const [currentYear, setCurrentYear] = useState<number | null>(null);
   const [motivationalQuote, setMotivationalQuote] = useState<string | null>(null);
+  const [quoteKey, setQuoteKey] = useState(0); // Key to re-trigger quote animation
   const quoteIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 
@@ -63,19 +64,18 @@ export default function StudySmartPage(): JSX.Element {
 
   useEffect(() => {
     if (currentStep === "loading") {
-      // Set initial quote immediately
-      setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
+      const setNextQuote = () => {
+        setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
+        setQuoteKey(prevKey => prevKey + 1); // Increment key to re-trigger animation
+      };
       
-      // Start interval to change quote every 3 seconds
-      // Clear any existing interval before starting a new one
+      setNextQuote(); // Set initial quote immediately
+      
       if (quoteIntervalRef.current) {
         clearInterval(quoteIntervalRef.current);
       }
-      quoteIntervalRef.current = setInterval(() => {
-        setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
-      }, 3000);
+      quoteIntervalRef.current = setInterval(setNextQuote, 3000);
     } else {
-      // Clear interval and quote if currentStep is not "loading"
       if (quoteIntervalRef.current) {
         clearInterval(quoteIntervalRef.current);
         quoteIntervalRef.current = null;
@@ -83,7 +83,6 @@ export default function StudySmartPage(): JSX.Element {
       setMotivationalQuote(null);
     }
 
-    // Cleanup function for when component unmounts or currentStep changes
     return () => {
       if (quoteIntervalRef.current) {
         clearInterval(quoteIntervalRef.current);
@@ -207,7 +206,10 @@ export default function StudySmartPage(): JSX.Element {
           <div className="animate-pop-in text-center">
             <LoadingSpinner size="lg" />
             {motivationalQuote && (
-              <p className="mt-6 text-lg text-muted-foreground italic animate-fade-in-slide-up delay-500 min-h-[50px] flex items-center justify-center">
+              <p 
+                key={quoteKey} // Key to re-trigger animation on change
+                className="mt-6 text-lg text-muted-foreground italic animate-shake min-h-[50px] flex items-center justify-center"
+              >
                 &ldquo;{motivationalQuote}&rdquo;
               </p>
             )}
@@ -307,6 +309,7 @@ export default function StudySmartPage(): JSX.Element {
 }
 
   
+
 
 
 
