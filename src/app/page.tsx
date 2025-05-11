@@ -7,6 +7,7 @@ import { DocumentInputForm, type DocumentInputFormValues } from "@/components/st
 import { StudyDashboardView } from "@/components/study/study-dashboard-view";
 import { FlashcardPlayer } from "@/components/study/flashcard-player";
 import { QuizPlayer } from "@/components/study/quiz-player";
+import { NotesEditor } from "@/components/study/notes-editor";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { generateFlashcards, type GenerateFlashcardsOutput } from "@/ai/flows/generate-flashcards";
@@ -19,7 +20,7 @@ import { studyQuotes } from "@/lib/quotes";
 import { IntroductionPage } from "@/components/layout/introduction-page";
 
 
-type AppStep = "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "results"; // Add "notes" if/when implemented
+type AppStep = "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "results" | "notes";
 
 interface StudyResults {
   type: 'flashcards' | 'quiz';
@@ -195,11 +196,6 @@ export default function StudySmartPage(): JSX.Element {
     setCurrentStep("results");
   };
 
-  // Placeholder for "Make Notes" if it becomes a separate step
-  // const handleStartNotes = () => {
-  //   setCurrentStep("notes"); // Or open a modal, etc.
-  // };
-
   const renderStepContent = () => {
     switch (currentStep) {
       case "introduction":
@@ -226,7 +222,7 @@ export default function StudySmartPage(): JSX.Element {
           <StudyDashboardView
             onStartFlashcards={() => setCurrentStep("flashcards")}
             onStartQuiz={() => setCurrentStep("quiz")}
-            // onStartNotes={handleStartNotes} // Pass if "notes" step/modal is implemented
+            onStartNotes={() => setCurrentStep("notes")} 
             hasFlashcards={!!flashcardsData && flashcardsData.length > 0}
             hasQuiz={!!quizData && quizData.length > 0}
             topicSummaries={documentTopicSummaries}
@@ -256,15 +252,15 @@ export default function StudySmartPage(): JSX.Element {
                   onExit={() => setCurrentStep("dashboard")} 
                   onIncrementPoints={handleIncrementGlobalPoints}
                 />;
-      // case "notes": // If "notes" becomes a distinct step
-      //   return <div>Notes Editor (To be implemented)</div>;
+      case "notes":
+        return <NotesEditor onExit={() => setCurrentStep("dashboard")} />;
       case "results":
         if (!studyResults) {
           setCurrentStep("dashboard"); 
           return null;
         }
         return (
-          <Card className="w-full max-w-xl mx-auto text-center shadow-xl animate-pop-in"> {/* Increased max-width */}
+          <Card className="w-full max-w-xl mx-auto text-center shadow-xl animate-pop-in">
             <CardHeader>
               <CardTitle className="text-3xl font-bold flex items-center justify-center gap-2">
                 <PartyPopper className="h-10 w-10 text-accent animate-pulse-glow" />
@@ -315,11 +311,3 @@ export default function StudySmartPage(): JSX.Element {
     </div>
   );
 }
-
-  
-
-
-
-
-
-
