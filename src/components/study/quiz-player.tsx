@@ -14,14 +14,15 @@ interface QuizPlayerProps {
   quiz: GenerateMcqQuizOutput['quiz'];
   onComplete: (pointsEarned: number, correctAnswers: number, totalAnswers: number) => void;
   onExit: () => void;
+  onIncrementPoints: (amount: number) => void;
 }
 
-export function QuizPlayer({ quiz, onComplete, onExit }: QuizPlayerProps): JSX.Element {
+export function QuizPlayer({ quiz, onComplete, onExit, onIncrementPoints }: QuizPlayerProps): JSX.Element {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [points, setPoints] = useState(0);
+  const [sessionPoints, setSessionPoints] = useState(0); // Renamed from points
   const [answersSubmitted, setAnswersSubmitted] = useState(0);
   const [questionKey, setQuestionKey] = useState(0); // For animating question transition
 
@@ -44,7 +45,9 @@ export function QuizPlayer({ quiz, onComplete, onExit }: QuizPlayerProps): JSX.E
     setAnswersSubmitted(prev => prev + 1);
 
     if (correct) {
-      setPoints(prevPoints => prevPoints + 10);
+      const pointsToAward = 10;
+      setSessionPoints(prevPoints => prevPoints + pointsToAward);
+      onIncrementPoints(pointsToAward); // Increment global points
     }
   };
 
@@ -52,7 +55,8 @@ export function QuizPlayer({ quiz, onComplete, onExit }: QuizPlayerProps): JSX.E
     if (currentIndex < quiz.length - 1) {
       setCurrentIndex(prevIndex => prevIndex + 1);
     } else {
-      onComplete(points, points / 10, quiz.length);
+      const correctAnswersCount = Math.round(sessionPoints / 10); // Calculate correct answers from sessionPoints
+      onComplete(sessionPoints, correctAnswersCount, quiz.length);
     }
   };
 

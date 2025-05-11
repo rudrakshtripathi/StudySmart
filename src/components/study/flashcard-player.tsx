@@ -13,12 +13,13 @@ interface FlashcardPlayerProps {
   flashcards: GenerateFlashcardsOutput['flashcards'];
   onComplete: (pointsEarned: number, correctAnswers: number, totalAnswers: number) => void;
   onExit: () => void;
+  onIncrementPoints: (amount: number) => void;
 }
 
-export function FlashcardPlayer({ flashcards, onComplete, onExit }: FlashcardPlayerProps): JSX.Element {
+export function FlashcardPlayer({ flashcards, onComplete, onExit, onIncrementPoints }: FlashcardPlayerProps): JSX.Element {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [points, setPoints] = useState(0);
+  const [sessionPoints, setSessionPoints] = useState(0); // Renamed from points to avoid confusion
   const [answers, setAnswers] = useState<Array<'correct' | 'incorrect' | null>>(new Array(flashcards.length).fill(null));
   const [showFeedback, setShowFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [cardKey, setCardKey] = useState(0); // Used to re-trigger animation
@@ -43,10 +44,12 @@ export function FlashcardPlayer({ flashcards, onComplete, onExit }: FlashcardPla
     
     setShowFeedback(knewIt ? 'correct' : 'incorrect');
 
-    let currentPoints = points;
+    let currentSessionPoints = sessionPoints;
     if (knewIt) {
-      currentPoints += 10;
-      setPoints(currentPoints);
+      const pointsToAward = 10;
+      currentSessionPoints += pointsToAward;
+      setSessionPoints(currentSessionPoints);
+      onIncrementPoints(pointsToAward); // Increment global points
     }
 
     setTimeout(() => {
@@ -54,7 +57,7 @@ export function FlashcardPlayer({ flashcards, onComplete, onExit }: FlashcardPla
         setCurrentIndex(prev => prev + 1);
       } else {
         const correctCount = newAnswers.filter(a => a === 'correct').length;
-        onComplete(currentPoints, correctCount, flashcards.length);
+        onComplete(currentSessionPoints, correctCount, flashcards.length);
       }
     }, 1500);
   };
@@ -64,7 +67,6 @@ export function FlashcardPlayer({ flashcards, onComplete, onExit }: FlashcardPla
     if (direction === 'next' && currentIndex < flashcards.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else if (direction === 'prev' && currentIndex > 0) {
-      setCurrentIndex(prev => prev + 1); // This was prev => prev - 1, correcting
       setCurrentIndex(prev => prev - 1);
     }
   };
@@ -94,7 +96,7 @@ export function FlashcardPlayer({ flashcards, onComplete, onExit }: FlashcardPla
         <div 
           className={cn(
             "relative w-[90%] md:w-[80%] aspect-[16/10] rounded-xl shadow-2xl cursor-pointer transition-transform duration-700 transform-style-preserve-3d group hover:shadow-primary/30",
-            isFlipped ? 'animate-flashcard-flip' : '' // Using custom animation for flip
+            // isFlipped ? 'animate-flashcard-flip' : '' // Using custom animation for flip. Removed as style transform is used.
           )}
           onClick={handleFlip}
           data-ai-hint="flashcard content"

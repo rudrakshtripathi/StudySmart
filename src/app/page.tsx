@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -129,14 +128,16 @@ export default function StudySmartPage(): JSX.Element {
     }
   };
 
+  const handleIncrementGlobalPoints = (amount: number) => {
+    setPoints(prev => prev + amount);
+  };
+
   const handleFlashcardComplete = (pointsEarnedSession: number, correctAnswers: number, totalAnswers: number) => {
-    setPoints(prev => prev + pointsEarnedSession);
     setStudyResults({ type: 'flashcards', pointsEarned: pointsEarnedSession, correctAnswers, totalAnswers });
     setCurrentStep("results");
   };
 
   const handleQuizComplete = (pointsEarnedSession: number, correctAnswers: number, totalAnswers: number) => {
-    setPoints(prev => prev + pointsEarnedSession);
     setStudyResults({ type: 'quiz', pointsEarned: pointsEarnedSession, correctAnswers, totalAnswers });
     setCurrentStep("results");
   };
@@ -163,14 +164,24 @@ export default function StudySmartPage(): JSX.Element {
           setCurrentStep("dashboard");
           return <LoadingSpinner />;
         }
-        return <FlashcardPlayer flashcards={flashcardsData} onComplete={handleFlashcardComplete} onExit={() => setCurrentStep("dashboard")} />;
+        return <FlashcardPlayer 
+                  flashcards={flashcardsData} 
+                  onComplete={handleFlashcardComplete} 
+                  onExit={() => setCurrentStep("dashboard")} 
+                  onIncrementPoints={handleIncrementGlobalPoints}
+                />;
       case "quiz":
          if (!quizData) {
           toast({ title: "Error", description: "Quiz data not found. Returning to dashboard.", variant: "destructive" });
           setCurrentStep("dashboard");
           return <LoadingSpinner />;
         }
-        return <QuizPlayer quiz={quizData} onComplete={handleQuizComplete} onExit={() => setCurrentStep("dashboard")} />;
+        return <QuizPlayer 
+                  quiz={quizData} 
+                  onComplete={handleQuizComplete} 
+                  onExit={() => setCurrentStep("dashboard")} 
+                  onIncrementPoints={handleIncrementGlobalPoints}
+                />;
       case "results":
         if (!studyResults) {
           setCurrentStep("dashboard"); 
