@@ -1,3 +1,4 @@
+
 // src/components/study/flashcard-player.tsx
 "use client";
 
@@ -73,7 +74,7 @@ export function FlashcardPlayer({ flashcards, onComplete, onExit, onIncrementPoi
 
   if (!currentFlashcard) {
     return (
-      <Card className="w-full max-w-xl mx-auto shadow-xl animate-pop-in">
+      <Card className="w-full max-w-3xl mx-auto shadow-xl animate-pop-in"> {/* Increased max-width */}
         <CardHeader><CardTitle>Loading Flashcards...</CardTitle></CardHeader>
         <CardContent><p>Please wait.</p></CardContent>
       </Card>
@@ -81,7 +82,7 @@ export function FlashcardPlayer({ flashcards, onComplete, onExit, onIncrementPoi
   }
 
   return (
-    <Card className="w-full max-w-xl mx-auto shadow-2xl flex flex-col border-2 border-primary/20 rounded-xl bg-gradient-to-br from-card to-background animate-pop-in overflow-hidden">
+    <Card className="w-full max-w-3xl mx-auto shadow-2xl flex flex-col border-2 border-primary/20 rounded-xl bg-gradient-to-br from-card to-background animate-pop-in overflow-hidden"> {/* Increased max-width */}
       <CardHeader className="bg-primary/5">
         <div className="flex justify-between items-center mb-2">
           <CardTitle className="flex items-center gap-2 text-primary">
@@ -92,7 +93,7 @@ export function FlashcardPlayer({ flashcards, onComplete, onExit, onIncrementPoi
         </div>
         <Progress value={progress} className="w-full h-3 bg-primary/20 [&>div]:bg-primary transition-all duration-500" />
       </CardHeader>
-      <CardContent key={cardKey} className="flex-grow flex flex-col items-center justify-center min-h-[300px] md:min-h-[350px] relative p-4 perspective-1500 animate-fade-in-slide-up">
+      <CardContent key={cardKey} className="flex-grow flex flex-col items-center justify-center min-h-[400px] md:min-h-[450px] relative p-4 perspective-1500 animate-fade-in-slide-up"> {/* Increased min-height */}
         <div 
           className={cn(
             "relative w-[90%] md:w-[80%] aspect-[16/10] rounded-xl shadow-2xl cursor-pointer transition-transform duration-700 transform-style-preserve-3d group hover:shadow-primary/30",

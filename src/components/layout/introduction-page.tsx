@@ -21,7 +21,7 @@ export function IntroductionPage({ onSubmit }: IntroductionPageProps): JSX.Eleme
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-xl animate-pop-in">
+    <Card className="w-full max-w-xl mx-auto shadow-xl animate-pop-in"> {/* Increased max-width */}
       <CardHeader className="text-center">
         <div className="flex justify-center items-center mb-4">
             <Sparkles className="h-12 w-12 text-primary animate-pulse-glow" />

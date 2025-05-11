@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -62,7 +63,7 @@ export function QuizPlayer({ quiz, onComplete, onExit, onIncrementPoints }: Quiz
 
   if (!currentQuestion) {
     return (
-      <Card className="w-full max-w-2xl mx-auto shadow-xl animate-pop-in">
+      <Card className="w-full max-w-4xl mx-auto shadow-xl animate-pop-in"> {/* Increased max-width */}
         <CardHeader><CardTitle>Loading Quiz...</CardTitle></CardHeader>
         <CardContent><p>Please wait.</p></CardContent>
       </Card>
@@ -70,7 +71,7 @@ export function QuizPlayer({ quiz, onComplete, onExit, onIncrementPoints }: Quiz
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-2xl border-2 border-primary/10 rounded-xl animate-pop-in overflow-hidden">
+    <Card className="w-full max-w-4xl mx-auto shadow-2xl border-2 border-primary/10 rounded-xl animate-pop-in overflow-hidden"> {/* Increased max-width */}
       <CardHeader className="bg-primary/5" key={questionKey}> {/* Key for animation */}
         <div className="flex justify-between items-center mb-2">
           <CardTitle className="flex items-center gap-2 text-primary animate-question-slide-in">

@@ -256,7 +256,7 @@ export default function StudySmartPage(): JSX.Element {
           return null;
         }
         return (
-          <Card className="w-full max-w-md mx-auto text-center shadow-xl animate-pop-in">
+          <Card className="w-full max-w-xl mx-auto text-center shadow-xl animate-pop-in"> {/* Increased max-width */}
             <CardHeader>
               <CardTitle className="text-3xl font-bold flex items-center justify-center gap-2">
                 <PartyPopper className="h-10 w-10 text-accent animate-pulse-glow" />
@@ -309,6 +309,7 @@ export default function StudySmartPage(): JSX.Element {
 }
 
   
+
 
 
 

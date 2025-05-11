@@ -23,8 +23,8 @@ export function StudyDashboardView({
   topicSummaries
 }: StudyDashboardViewProps): JSX.Element {
   return (
-    <div className="w-full max-w-5xl mx-auto animate-fade-in-slide-up">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="w-full max-w-7xl mx-auto animate-fade-in-slide-up"> {/* Increased max-width */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8"> {/* Increased gap */}
         {/* Document Topic Summaries Card - takes 2 columns on md and up */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 animate-pop-in delay-100 md:col-span-2">
           <CardHeader>
@@ -44,7 +44,7 @@ export function StudyDashboardView({
           </CardHeader>
           <CardContent>
             {topicSummaries && topicSummaries.length > 0 ? (
-              <ScrollArea className="h-[400px] pr-4"> {/* Increased height */}
+              <ScrollArea className="h-[550px] pr-4"> {/* Increased height */}
                 <div className="space-y-6">
                   {topicSummaries.map((item, index) => (
                     <div key={index} className="animate-fade-in-slide-up" style={{animationDelay: `${index * 100}ms`}}>
@@ -71,7 +71,7 @@ export function StudyDashboardView({
         </Card>
 
         {/* Study Aids Section - takes 1 column on md and up, stacks Flashcards and Quiz vertically */}
-        <div className="md:col-span-1 space-y-6">
+        <div className="md:col-span-1 space-y-8"> {/* Increased space-y for consistency with gap */}
           <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-pop-in delay-200">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">

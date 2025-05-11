@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,7 +44,7 @@ export function DocumentInputForm({ onSubmit, isLoading }: DocumentInputFormProp
   });
 
   return (
-    <Card className="w-full max-w-xl mx-auto shadow-xl animate-pop-in">
+    <Card className="w-full max-w-2xl mx-auto shadow-xl animate-pop-in"> {/* Increased max-width */}
       <CardHeader>
         <CardTitle className="text-2xl flex items-center gap-2">
           <Brain className="h-7 w-7 text-primary" />
