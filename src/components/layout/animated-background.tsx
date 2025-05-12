@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { BookOpen, Brain, FlaskConical, Lightbulb, BarChart3 } from 'lucide-react';
+import { BookOpen, Brain, FlaskConical, Lightbulb, BarChart3, Star, Sparkles } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 
 interface FloatingIconData {
@@ -18,8 +18,10 @@ const iconTypes = [
   { component: FlaskConical, baseSize: 32, hint: "flask" },
   { component: Lightbulb, baseSize: 38, hint: "idea" },
   { component: BarChart3, baseSize: 34, hint: "chart" },
+  { component: Star, baseSize: 28, hint: "star" },
+  { component: Sparkles, baseSize: 30, hint: "sparkle" },
 ];
-const TOTAL_ICONS = 15; // Total number of icons to display
+const TOTAL_ICONS = 20; // Increased total icons for more density with new types
 
 export function AnimatedBackground(): JSX.Element {
   const [floatingIcons, setFloatingIcons] = useState<FloatingIconData[]>([]);
@@ -27,9 +29,9 @@ export function AnimatedBackground(): JSX.Element {
   useEffect(() => {
     const generateIcon = (index: number): FloatingIconData => {
       const selectedIconType = iconTypes[index % iconTypes.length];
-      const duration = Math.random() * 20 + 20; // 20s to 40s for slower, more subtle movement
-      const delay = Math.random() * 20;         // 0s to 20s
-      const scaleMultiplier = Math.random() * 0.3 + 0.9; // 0.9 to 1.2 for slight size variation
+      const duration = Math.random() * 20 + 25; // 25s to 45s for even slower, more subtle movement
+      const delay = Math.random() * 25;         // 0s to 25s
+      const scaleMultiplier = Math.random() * 0.25 + 0.85; // 0.85 to 1.1 for slight size variation
       const initialScale = scaleMultiplier;
 
       return {
@@ -42,7 +44,7 @@ export function AnimatedBackground(): JSX.Element {
           animationDelay: `${delay}s`,
           '--initial-scale': initialScale,
         } as React.CSSProperties,
-        size: selectedIconType.baseSize * (Math.random() * 0.4 + 0.8), // Vary base size by +/- 20%
+        size: selectedIconType.baseSize * (Math.random() * 0.3 + 0.7), // Vary base size by +/- 15% for more subtlety
       };
     };
 
@@ -56,7 +58,7 @@ export function AnimatedBackground(): JSX.Element {
   }
 
   return (
-    <div className="fixed inset-0 z-[-5] overflow-hidden pointer-events-none" aria-hidden="true" data-ai-hint="animated icons background">
+    <div className="fixed inset-0 z-[-5] overflow-hidden pointer-events-none" aria-hidden="true" data-ai-hint="animated icons background stars sparkles">
       {floatingIcons.map(({ id, IconComponent, style, size }) => (
         <IconComponent
           key={id}
@@ -69,3 +71,4 @@ export function AnimatedBackground(): JSX.Element {
     </div>
   );
 }
+
