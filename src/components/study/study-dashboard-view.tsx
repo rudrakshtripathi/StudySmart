@@ -104,19 +104,33 @@ export function StudyDashboardView({
         {/* Document Topic Summaries Card - takes 2 columns on md and up */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 animate-pop-in delay-100 md:col-span-2">
           <CardHeader>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <FileText className="h-7 w-7 text-primary" />
-              Document Topic Summaries
-            </CardTitle>
-            {topicSummaries && topicSummaries.length > 0 ? (
-              <CardDescription>
-                Key topics and their bullet-point summaries from your document.
-              </CardDescription>
-            ) : (
-              <CardDescription>
-                Upload a PDF document to see its topic summaries here.
-              </CardDescription>
-            )}
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <FileText className="h-7 w-7 text-primary" />
+                  Document Topic Summaries
+                </CardTitle>
+                {topicSummaries && topicSummaries.length > 0 ? (
+                  <CardDescription>
+                    Key topics and their bullet-point summaries from your document.
+                  </CardDescription>
+                ) : (
+                  <CardDescription>
+                    Upload a PDF document to see its topic summaries here.
+                  </CardDescription>
+                )}
+              </div>
+              <Button 
+                onClick={handleDownloadSummary} 
+                className="ml-auto transition-transform hover:scale-105 active:scale-95" 
+                variant="outline"
+                size="sm"
+                disabled={!topicSummaries || topicSummaries.length === 0}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                {topicSummaries && topicSummaries.length > 0 ? "Download PDF" : "No Summary"}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {topicSummaries && topicSummaries.length > 0 ? (
@@ -144,16 +158,10 @@ export function StudyDashboardView({
               </p>
             )}
           </CardContent>
-          <CardFooter>
-            <Button 
-              onClick={handleDownloadSummary} 
-              className="w-full md:w-auto transition-transform hover:scale-105 active:scale-95" 
-              disabled={!topicSummaries || topicSummaries.length === 0}
-            >
-              <Download className="mr-2 h-5 w-5" />
-              {topicSummaries && topicSummaries.length > 0 ? "Download Summary PDF" : "No Summary to Download"}
-            </Button>
-          </CardFooter>
+          {/* CardFooter can be removed if it's empty or add other elements if needed */}
+           {/* <CardFooter>
+             
+           </CardFooter> */}
         </Card>
 
         {/* Study Aids Section - takes 1 column on md and up, stacks Flashcards, Quiz and Notes vertically */}
@@ -219,3 +227,4 @@ export function StudyDashboardView({
     </div>
   );
 }
+
