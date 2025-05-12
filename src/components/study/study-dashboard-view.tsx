@@ -4,8 +4,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Zap, BookOpen, NotebookPen } from "lucide-react";
+import { FileText, Zap, BookOpen, NotebookPen, Download } from "lucide-react";
 import type { SummarizeDocumentOutput } from "@/ai/flows/summarize-document";
+import jsPDF from 'jspdf';
+import { useToast } from "@/hooks/use-toast";
 
 interface StudyDashboardViewProps {
   onStartFlashcards: () => void;
@@ -24,6 +26,78 @@ export function StudyDashboardView({
   hasQuiz,
   topicSummaries
 }: StudyDashboardViewProps): JSX.Element {
+  const { toast } = useToast();
+
+  const handleDownloadSummary = () => {
+    if (!topicSummaries || topicSummaries.length === 0) {
+      toast({ title: "No Summary", description: "No summary available to download.", variant: "destructive" });
+      return;
+    }
+
+    try {
+      const doc = new jsPDF();
+      let yPos = 20; // Initial Y position (margin from top)
+      const pageHeight = doc.internal.pageSize.height;
+      const pageWidth = doc.internal.pageSize.width;
+      const margin = 20;
+      const contentWidth = pageWidth - (margin * 2);
+      const lineHeight = 7; // Approximate line height for text
+      const topicTitleSize = 16;
+      const bulletPointSize = 12;
+
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text("Document Topic Summaries", pageWidth / 2, yPos, { align: 'center' });
+      yPos += lineHeight * 2.5;
+
+      topicSummaries.forEach((summaryItem) => {
+        // Estimate height for the topic item
+        let estimatedHeight = lineHeight * 1.5; // For topic title
+        summaryItem.bulletPoints.forEach(point => {
+          const splitPoint = doc.splitTextToSize(`• ${point}`, contentWidth -5); // -5 for bullet indent
+          estimatedHeight += splitPoint.length * lineHeight;
+        });
+        estimatedHeight += lineHeight; // Space after bullets
+
+        if (yPos + estimatedHeight > pageHeight - margin) {
+          doc.addPage();
+          yPos = margin;
+        }
+
+        doc.setFontSize(topicTitleSize);
+        doc.setFont('helvetica', 'bold');
+        doc.text(summaryItem.topic, margin, yPos);
+        yPos += lineHeight * 1.5; 
+
+        doc.setFontSize(bulletPointSize);
+        doc.setFont('helvetica', 'normal');
+        summaryItem.bulletPoints.forEach(point => {
+          const splitPoint = doc.splitTextToSize(`• ${point}`, contentWidth - 5);
+          if (yPos + (splitPoint.length * lineHeight) > pageHeight - margin) {
+            doc.addPage();
+            yPos = margin;
+            // Re-add topic title if it's a new page and this is the first bullet of a topic
+            // This check is simplified, assuming topic title won't be alone at bottom of a page
+          }
+          doc.text(splitPoint, margin + 5, yPos);
+          yPos += (splitPoint.length * lineHeight);
+        });
+        yPos += lineHeight; 
+      });
+
+      doc.save("document_summary.pdf");
+      toast({ title: "Download Started", description: "Your summary PDF is being downloaded." });
+    } catch (error) {
+        console.error("Failed to generate summary PDF:", error);
+        toast({
+            title: "Download Failed",
+            description: "Could not generate the summary PDF. Please try again.",
+            variant: "destructive",
+        });
+    }
+  };
+
+
   return (
     <div className="w-full max-w-7xl mx-auto animate-fade-in-slide-up">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -46,7 +120,7 @@ export function StudyDashboardView({
           </CardHeader>
           <CardContent>
             {topicSummaries && topicSummaries.length > 0 ? (
-              <ScrollArea className="h-[550px] pr-4">
+              <ScrollArea className="h-[500px] pr-4"> {/* Adjusted height slightly */}
                 <div className="space-y-6">
                   {topicSummaries.map((item, index) => (
                     <div key={index} className="animate-fade-in-slide-up" style={{animationDelay: `${index * 100}ms`}}>
@@ -70,6 +144,16 @@ export function StudyDashboardView({
               </p>
             )}
           </CardContent>
+          <CardFooter>
+            <Button 
+              onClick={handleDownloadSummary} 
+              className="w-full md:w-auto transition-transform hover:scale-105 active:scale-95" 
+              disabled={!topicSummaries || topicSummaries.length === 0}
+            >
+              <Download className="mr-2 h-5 w-5" />
+              {topicSummaries && topicSummaries.length > 0 ? "Download Summary PDF" : "No Summary to Download"}
+            </Button>
+          </CardFooter>
         </Card>
 
         {/* Study Aids Section - takes 1 column on md and up, stacks Flashcards, Quiz and Notes vertically */}
