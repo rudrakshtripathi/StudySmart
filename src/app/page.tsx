@@ -15,7 +15,7 @@ import { generateMcqQuiz, type GenerateMcqQuizOutput } from "@/ai/flows/generate
 import { summarizeDocument, type SummarizeDocumentOutput } from "@/ai/flows/summarize-document";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { PartyPopper, Star } from "lucide-react";
+import { PartyPopper, Star, Linkedin, Github } from "lucide-react";
 import { studyQuotes } from "@/lib/quotes";
 import { IntroductionPage } from "@/components/layout/introduction-page";
 
@@ -306,8 +306,29 @@ export default function StudySmartPage(): JSX.Element {
         <p>
           {currentYear !== null ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
         </p>
-        <p className="mt-1">Created by Rudraksh Tripathi</p>
+        <p className="mt-1">
+          Created by Rudraksh Tripathi
+          <span className="mx-2">|</span>
+          <a 
+            href="https://www.linkedin.com/in/rudraksh--tripathi" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+          >
+            <Linkedin className="h-4 w-4" /> LinkedIn
+          </a>
+          <span className="mx-2">|</span>
+          <a 
+            href="https://github.com/rudrakshtripathi" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+          >
+            <Github className="h-4 w-4" /> GitHub
+          </a>
+        </p>
       </footer>
     </div>
   );
 }
+
