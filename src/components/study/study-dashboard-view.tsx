@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Zap, BookOpen, NotebookPen, Download } from "lucide-react";
+import { FileText, Zap, BookOpen, NotebookPen, Download, UploadCloud } from "lucide-react";
 import type { SummarizeDocumentOutput } from "@/ai/flows/summarize-document";
 import jsPDF from 'jspdf';
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ interface StudyDashboardViewProps {
   onStartFlashcards: () => void;
   onStartQuiz: () => void;
   onStartNotes: () => void; 
+  onUploadAnother: () => void;
   hasFlashcards: boolean;
   hasQuiz: boolean;
   topicSummaries: SummarizeDocumentOutput['topicSummaries'] | null;
@@ -22,6 +23,7 @@ export function StudyDashboardView({
   onStartFlashcards, 
   onStartQuiz,
   onStartNotes,
+  onUploadAnother,
   hasFlashcards,
   hasQuiz,
   topicSummaries
@@ -158,14 +160,19 @@ export function StudyDashboardView({
               </p>
             )}
           </CardContent>
-          {/* CardFooter can be removed if it's empty or add other elements if needed */}
-           {/* <CardFooter>
-             
-           </CardFooter> */}
         </Card>
 
         {/* Study Aids Section - takes 1 column on md and up, stacks Flashcards, Quiz and Notes vertically */}
         <div className="md:col-span-1 space-y-8">
+          <Button 
+            onClick={onUploadAnother} 
+            className="w-full text-lg py-6 transition-transform hover:scale-105 active:scale-95 mb-4 animate-pop-in delay-150"
+            variant="outline"
+          >
+            <UploadCloud className="mr-2 h-6 w-6" />
+            Upload Another PDF
+          </Button>
+
           <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-pop-in delay-200">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">

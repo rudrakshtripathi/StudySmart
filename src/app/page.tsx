@@ -196,6 +196,15 @@ export default function StudySmartPage(): JSX.Element {
     setCurrentStep("results");
   };
 
+  const handleUploadAnotherDocument = () => {
+    setFlashcardsData(null);
+    setQuizData(null);
+    setDocumentTopicSummaries(null);
+    setStudyResults(null);
+    setCurrentStep("input");
+    toast({ title: "Ready for a new document!", description: "Upload another PDF to continue learning." });
+  };
+
   const renderStepContent = () => {
     switch (currentStep) {
       case "introduction":
@@ -223,6 +232,7 @@ export default function StudySmartPage(): JSX.Element {
             onStartFlashcards={() => setCurrentStep("flashcards")}
             onStartQuiz={() => setCurrentStep("quiz")}
             onStartNotes={() => setCurrentStep("notes")} 
+            onUploadAnother={handleUploadAnotherDocument}
             hasFlashcards={!!flashcardsData && flashcardsData.length > 0}
             hasQuiz={!!quizData && quizData.length > 0}
             topicSummaries={documentTopicSummaries}
@@ -308,13 +318,13 @@ export default function StudySmartPage(): JSX.Element {
             {currentYear !== null ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-1">
-            <span>Created by Rudraksh Tripathi</span>
+            <span className="font-semibold">Created by Rudraksh Tripathi</span>
             <span className="text-muted-foreground/60 hidden sm:inline">&bull;</span>
             <a 
               href="https://www.linkedin.com/in/rudraksh--tripathi" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+              className="inline-flex items-center gap-1 hover:text-primary transition-colors font-semibold"
             >
               <Linkedin className="h-4 w-4" /> LinkedIn
             </a>
@@ -323,7 +333,7 @@ export default function StudySmartPage(): JSX.Element {
               href="https://github.com/rudrakshtripathi" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+              className="inline-flex items-center gap-1 hover:text-primary transition-colors font-semibold"
             >
               <Github className="h-4 w-4" /> GitHub
             </a>
