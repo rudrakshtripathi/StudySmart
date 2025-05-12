@@ -3,6 +3,7 @@ import type {Metadata} from 'next';
 import {Geist, Geist_Mono} from 'next/font/google';
 import './globals.css';
 import { AppProviders } from '@/providers/app-providers';
+import { AnimatedBackground } from '@/components/layout/animated-background';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,6 +32,7 @@ export default function RootLayout({
         data-ai-hint="app background"
         suppressHydrationWarning={true}
       >
+        <AnimatedBackground />
         <AppProviders>
           {children}
         </AppProviders>

@@ -91,7 +91,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -10; /* Ensure it's behind all content */
+    z-index: -10; /* Ensure it's behind all content, including new floating icons */
     background-image: url('/logo-background.png'); /* Assuming the image is in public/logo-background.png */
     background-repeat: no-repeat;
     background-position: center center;
@@ -144,6 +144,11 @@ body {
   }
   .animate-option-select {
     animation: option-select-pulse 0.3s ease-out;
+  }
+
+  .floating-icon {
+    animation: float-fade infinite ease-in-out alternate;
+    will-change: transform, opacity; /* Performance hint */
   }
 }
 
@@ -206,7 +211,31 @@ body {
   100% { transform: scale(1); }
 }
 
-/* Ensure content is above the pseudo-element background */
+@keyframes float-fade {
+  0% {
+    transform: translateY(0px) translateX(0px) rotate(0deg) scale(var(--initial-scale));
+    opacity: 0.1;
+  }
+  25% {
+    transform: translateY(-15px) translateX(8px) rotate(7deg) scale(calc(var(--initial-scale) * 1.05));
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-25px) translateX(-5px) rotate(-3deg) scale(calc(var(--initial-scale) * 0.95));
+    opacity: 0.15;
+  }
+  75% {
+    transform: translateY(-10px) translateX(12px) rotate(5deg) scale(calc(var(--initial-scale) * 1.1));
+    opacity: 0.25;
+  }
+  100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg) scale(var(--initial-scale));
+    opacity: 0.1;
+  }
+}
+
+
+/* Ensure content is above the pseudo-element background and floating icons */
 main, header, footer {
   position: relative;
   z-index: 1;
