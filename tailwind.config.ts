@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -115,7 +116,11 @@ export default {
         'pulse-glow': {
           '0%, 100%': { boxShadow: '0 0 0px hsl(var(--primary)/0.7)' },
           '50%': { boxShadow: '0 0 15px 5px hsl(var(--primary)/0.3)' },
-        }
+        },
+        pulse: { // Added Tailwind's default pulse for destructive timer
+            '0%, 100%': { opacity: '1' },
+            '50%': { opacity: '.5' },
+        },
   			},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
@@ -128,8 +133,10 @@ export default {
         'pop-in': 'pop-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
         'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
         'pulse-glow': 'pulse-glow 2s infinite ease-in-out',
+        pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite', // Added Tailwind's default pulse
   		}
   	}
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
