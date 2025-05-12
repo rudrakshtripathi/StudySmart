@@ -51,7 +51,7 @@ export function AppHeader({ points, userName }: AppHeaderProps): JSX.Element {
 
         {/* Center Section: Animated Tagline */}
         <div className="flex-grow text-center px-4 hidden md:block min-w-0"> {/* Hide on small screens, min-w-0 to prevent overflow issues */}
-          <p className="text-sm text-muted-foreground animate-fade-in delay-500 truncate"> {/* truncate added to prevent text wrapping issues */}
+          <p className="text-base text-muted-foreground animate-fade-in delay-500 truncate"> {/* Changed from text-sm to text-base, truncate added to prevent text wrapping issues */}
             {typedTagline}
             <span className={`transition-opacity duration-150 ${taglineCursorVisible ? 'opacity-100' : 'opacity-0'}`}>|</span>
           </p>
