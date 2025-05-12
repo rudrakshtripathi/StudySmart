@@ -165,7 +165,7 @@ export function StudyDashboardView({
           <Button 
             onClick={onUploadAnother} 
             className="w-full text-lg py-6 transition-transform hover:scale-105 active:scale-95 animate-pop-in delay-150"
-            variant="outline"
+            variant="default" // Changed from outline to default
           >
             <UploadCloud className="mr-2 h-6 w-6" />
             Upload Another PDF
