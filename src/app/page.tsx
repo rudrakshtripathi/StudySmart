@@ -302,31 +302,33 @@ export default function StudySmartPage(): JSX.Element {
           {renderStepContent()}
         </div>
       </main>
-      <footer className="py-4 text-center text-muted-foreground text-sm animate-fade-in-slide-up">
-        <p>
-          {currentYear !== null ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
-        </p>
-        <p className="mt-1">
-          Created by Rudraksh Tripathi
-          <span className="mx-2">|</span>
-          <a 
-            href="https://www.linkedin.com/in/rudraksh--tripathi" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="inline-flex items-center gap-1 hover:text-primary transition-colors"
-          >
-            <Linkedin className="h-4 w-4" /> LinkedIn
-          </a>
-          <span className="mx-2">|</span>
-          <a 
-            href="https://github.com/rudrakshtripathi" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 hover:text-primary transition-colors"
-          >
-            <Github className="h-4 w-4" /> GitHub
-          </a>
-        </p>
+      <footer className="py-6 text-muted-foreground text-sm animate-fade-in-slide-up">
+        <div className="container mx-auto flex flex-col items-center justify-center gap-2 px-4">
+          <p>
+            {currentYear !== null ? `StudySmart © ${currentYear} - Your AI Learning Companion` : 'Loading year...'}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-1">
+            <span>Created by Rudraksh Tripathi</span>
+            <span className="text-muted-foreground/60 hidden sm:inline">&bull;</span>
+            <a 
+              href="https://www.linkedin.com/in/rudraksh--tripathi" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+            >
+              <Linkedin className="h-4 w-4" /> LinkedIn
+            </a>
+            <span className="text-muted-foreground/60 hidden sm:inline">&bull;</span>
+            <a 
+              href="https://github.com/rudrakshtripathi" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+            >
+              <Github className="h-4 w-4" /> GitHub
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );
