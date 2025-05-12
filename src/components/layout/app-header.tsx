@@ -14,7 +14,7 @@ export function AppHeader({ points, userName }: AppHeaderProps): JSX.Element {
     <header className="py-4 px-6 shadow-md bg-card sticky top-0 z-50 animate-slide-in-from-top">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <LogoIcon className="h-8 w-8 text-primary animate-pop-in" />
+          <LogoIcon className="h-10 w-10 text-primary animate-pop-in" /> {/* Increased size from h-8 w-8 */}
           <h1 className="text-2xl font-bold text-primary animate-fade-in delay-200">StudySmart</h1>
         </div>
         <div className="flex items-center gap-4">
@@ -33,3 +33,4 @@ export function AppHeader({ points, userName }: AppHeaderProps): JSX.Element {
     </header>
   );
 }
+
