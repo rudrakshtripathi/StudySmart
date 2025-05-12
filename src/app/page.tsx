@@ -8,9 +8,8 @@ import { StudyDashboardView } from "@/components/study/study-dashboard-view";
 import { FlashcardPlayer } from "@/components/study/flashcard-player";
 import { QuizPlayer } from "@/components/study/quiz-player";
 import { NotesEditor } from "@/components/study/notes-editor";
-import { AskQuestionView } from "@/components/study/ask-question-view"; // New import
+import { AskQuestionView } from "@/components/study/ask-question-view";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { Preloader } from "@/components/layout/preloader";
 import { useToast } from "@/hooks/use-toast";
 import { generateFlashcards, type GenerateFlashcardsOutput } from "@/ai/flows/generate-flashcards";
 import { generateMcqQuiz, type GenerateMcqQuizOutput } from "@/ai/flows/generate-mcq-quiz";
@@ -22,7 +21,7 @@ import { studyQuotes } from "@/lib/quotes";
 import { IntroductionPage } from "@/components/layout/introduction-page";
 
 
-type AppStep = "preloading" | "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "askQuestion" | "results" | "notes";
+type AppStep = "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "askQuestion" | "results" | "notes";
 
 interface StudyResults {
   type: 'flashcards' | 'quiz';
@@ -45,7 +44,7 @@ const fileToDataUri = (file: File): Promise<string> => {
 };
 
 export default function StudySmartPage(): JSX.Element {
-  const [currentStep, setCurrentStep] = useState<AppStep>("preloading");
+  const [currentStep, setCurrentStep] = useState<AppStep>("introduction");
   const [points, setPoints] = useState(0);
   const [userName, setUserName] = useState<string | null>(null);
   
@@ -61,14 +60,6 @@ export default function StudySmartPage(): JSX.Element {
 
 
   const { toast } = useToast();
-
-   useEffect(() => {
-    // Simulate preloader
-    const timer = setTimeout(() => {
-      setCurrentStep("introduction");
-    }, 3000); // Adjust preloader duration as needed
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
@@ -220,8 +211,6 @@ export default function StudySmartPage(): JSX.Element {
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case "preloading":
-        return <Preloader />;
       case "introduction":
         return <IntroductionPage onSubmit={handleIntroductionSubmit} />;
       case "input":
@@ -247,7 +236,7 @@ export default function StudySmartPage(): JSX.Element {
             onStartFlashcards={() => setCurrentStep("flashcards")}
             onStartQuiz={() => setCurrentStep("quiz")}
             onStartNotes={() => setCurrentStep("notes")} 
-            onStartAskQuestion={() => setCurrentStep("askQuestion")} // New prop
+            onStartAskQuestion={() => setCurrentStep("askQuestion")} 
             onUploadAnother={handleUploadAnotherDocument}
             hasFlashcards={!!flashcardsData && flashcardsData.length > 0}
             hasQuiz={!!quizData && quizData.length > 0}
@@ -278,7 +267,7 @@ export default function StudySmartPage(): JSX.Element {
                   onExit={() => setCurrentStep("dashboard")} 
                   onIncrementPoints={handleIncrementGlobalPoints}
                 />;
-      case "askQuestion": // New case
+      case "askQuestion": 
         return <AskQuestionView 
                   documentText={documentFullTextForAI} 
                   onExit={() => setCurrentStep("dashboard")} 
