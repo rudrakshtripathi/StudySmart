@@ -4,7 +4,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Zap, BookOpen, NotebookPen, Download, UploadCloud } from "lucide-react";
+import { FileText, Zap, BookOpen, NotebookPen, Download, UploadCloud, MessageSquareQuote } from "lucide-react"; // Added MessageSquareQuote
 import type { SummarizeDocumentOutput } from "@/ai/flows/summarize-document";
 import jsPDF from 'jspdf';
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ interface StudyDashboardViewProps {
   onStartFlashcards: () => void;
   onStartQuiz: () => void;
   onStartNotes: () => void; 
+  onStartAskQuestion: () => void; // New prop
   onUploadAnother: () => void;
   hasFlashcards: boolean;
   hasQuiz: boolean;
@@ -23,6 +24,7 @@ export function StudyDashboardView({
   onStartFlashcards, 
   onStartQuiz,
   onStartNotes,
+  onStartAskQuestion, // Destructure new prop
   onUploadAnother,
   hasFlashcards,
   hasQuiz,
@@ -38,12 +40,12 @@ export function StudyDashboardView({
 
     try {
       const doc = new jsPDF();
-      let yPos = 20; // Initial Y position (margin from top)
+      let yPos = 20; 
       const pageHeight = doc.internal.pageSize.height;
       const pageWidth = doc.internal.pageSize.width;
       const margin = 20;
       const contentWidth = pageWidth - (margin * 2);
-      const lineHeight = 7; // Approximate line height for text
+      const lineHeight = 7; 
       const topicTitleSize = 16;
       const bulletPointSize = 12;
 
@@ -53,13 +55,12 @@ export function StudyDashboardView({
       yPos += lineHeight * 2.5;
 
       topicSummaries.forEach((summaryItem) => {
-        // Estimate height for the topic item
-        let estimatedHeight = lineHeight * 1.5; // For topic title
+        let estimatedHeight = lineHeight * 1.5; 
         summaryItem.bulletPoints.forEach(point => {
-          const splitPoint = doc.splitTextToSize(`• ${point}`, contentWidth -5); // -5 for bullet indent
+          const splitPoint = doc.splitTextToSize(`• ${point}`, contentWidth -5); 
           estimatedHeight += splitPoint.length * lineHeight;
         });
-        estimatedHeight += lineHeight; // Space after bullets
+        estimatedHeight += lineHeight; 
 
         if (yPos + estimatedHeight > pageHeight - margin) {
           doc.addPage();
@@ -78,8 +79,6 @@ export function StudyDashboardView({
           if (yPos + (splitPoint.length * lineHeight) > pageHeight - margin) {
             doc.addPage();
             yPos = margin;
-            // Re-add topic title if it's a new page and this is the first bullet of a topic
-            // This check is simplified, assuming topic title won't be alone at bottom of a page
           }
           doc.text(splitPoint, margin + 5, yPos);
           yPos += (splitPoint.length * lineHeight);
@@ -103,7 +102,6 @@ export function StudyDashboardView({
   return (
     <div className="w-full max-w-7xl mx-auto animate-fade-in-slide-up">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Document Topic Summaries Card - takes 2 columns on md and up */}
         <div className="md:col-span-2 space-y-6">
           <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 animate-pop-in delay-100">
             <CardHeader>
@@ -137,7 +135,7 @@ export function StudyDashboardView({
             </CardHeader>
             <CardContent>
               {topicSummaries && topicSummaries.length > 0 ? (
-                <ScrollArea className="h-[500px] pr-4"> {/* Adjusted height slightly */}
+                <ScrollArea className="h-[500px] pr-4"> 
                   <div className="space-y-6">
                     {topicSummaries.map((item, index) => (
                       <div key={index} className="animate-fade-in-slide-up" style={{animationDelay: `${index * 100}ms`}}>
@@ -164,15 +162,13 @@ export function StudyDashboardView({
           </Card>
           <Button 
             onClick={onUploadAnother} 
-            className="w-full text-lg py-6 transition-transform hover:scale-105 active:scale-95 animate-pop-in delay-150"
-            variant="default" // Changed from outline to default
+            className="w-full text-lg py-6 transition-transform hover:scale-105 active:scale-95 animate-pop-in delay-150 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-lg hover:shadow-xl"
           >
             <UploadCloud className="mr-2 h-6 w-6" />
             Upload Another PDF
           </Button>
         </div>
 
-        {/* Study Aids Section - takes 1 column on md and up, stacks Flashcards, Quiz and Notes vertically */}
         <div className="md:col-span-1 space-y-8">
           <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-pop-in delay-200">
             <CardHeader>
@@ -206,6 +202,28 @@ export function StudyDashboardView({
             <CardFooter>
               <Button onClick={onStartQuiz} className="w-full transition-transform hover:scale-105 active:scale-95" disabled={!hasQuiz}>
                  {hasQuiz ? "Take Quiz" : "No Quiz Generated"}
+              </Button>
+            </CardFooter>
+          </Card>
+
+          <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 animate-pop-in delay-350"> {/* New Card for Ask Question */}
+            <CardHeader>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <MessageSquareQuote className="h-6 w-6 text-primary" />
+                Ask a Question
+              </CardTitle>
+              <CardDescription>Get answers from your document content.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm">Ask specific questions and the AI will find answers within the document.</p>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                onClick={onStartAskQuestion} 
+                className="w-full transition-transform hover:scale-105 active:scale-95"
+                disabled={!topicSummaries || topicSummaries.length === 0}
+              >
+                Ask AI
               </Button>
             </CardFooter>
           </Card>

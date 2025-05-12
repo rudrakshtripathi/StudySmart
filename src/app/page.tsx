@@ -8,7 +8,9 @@ import { StudyDashboardView } from "@/components/study/study-dashboard-view";
 import { FlashcardPlayer } from "@/components/study/flashcard-player";
 import { QuizPlayer } from "@/components/study/quiz-player";
 import { NotesEditor } from "@/components/study/notes-editor";
+import { AskQuestionView } from "@/components/study/ask-question-view"; // New import
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Preloader } from "@/components/layout/preloader";
 import { useToast } from "@/hooks/use-toast";
 import { generateFlashcards, type GenerateFlashcardsOutput } from "@/ai/flows/generate-flashcards";
 import { generateMcqQuiz, type GenerateMcqQuizOutput } from "@/ai/flows/generate-mcq-quiz";
@@ -20,7 +22,7 @@ import { studyQuotes } from "@/lib/quotes";
 import { IntroductionPage } from "@/components/layout/introduction-page";
 
 
-type AppStep = "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "results" | "notes";
+type AppStep = "preloading" | "introduction" | "input" | "loading" | "dashboard" | "flashcards" | "quiz" | "askQuestion" | "results" | "notes";
 
 interface StudyResults {
   type: 'flashcards' | 'quiz';
@@ -43,7 +45,7 @@ const fileToDataUri = (file: File): Promise<string> => {
 };
 
 export default function StudySmartPage(): JSX.Element {
-  const [currentStep, setCurrentStep] = useState<AppStep>("introduction");
+  const [currentStep, setCurrentStep] = useState<AppStep>("preloading");
   const [points, setPoints] = useState(0);
   const [userName, setUserName] = useState<string | null>(null);
   
@@ -51,6 +53,7 @@ export default function StudySmartPage(): JSX.Element {
   const [quizData, setQuizData] = useState<GenerateMcqQuizOutput['quiz'] | null>(null);
   const [studyResults, setStudyResults] = useState<StudyResults | null>(null);
   const [documentTopicSummaries, setDocumentTopicSummaries] = useState<SummarizeDocumentOutput['topicSummaries'] | null>(null);
+  const [documentFullTextForAI, setDocumentFullTextForAI] = useState<string | null>(null); // For Ask Question
   const [currentYear, setCurrentYear] = useState<number | null>(null);
   const [motivationalQuote, setMotivationalQuote] = useState<string | null>(null);
   const [quoteKey, setQuoteKey] = useState(0); // Key to re-trigger quote animation
@@ -58,6 +61,14 @@ export default function StudySmartPage(): JSX.Element {
 
 
   const { toast } = useToast();
+
+   useEffect(() => {
+    // Simulate preloader
+    const timer = setTimeout(() => {
+      setCurrentStep("introduction");
+    }, 3000); // Adjust preloader duration as needed
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
@@ -67,10 +78,10 @@ export default function StudySmartPage(): JSX.Element {
     if (currentStep === "loading") {
       const setNextQuote = () => {
         setMotivationalQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
-        setQuoteKey(prevKey => prevKey + 1); // Increment key to re-trigger animation
+        setQuoteKey(prevKey => prevKey + 1); 
       };
       
-      setNextQuote(); // Set initial quote immediately
+      setNextQuote(); 
       
       if (quoteIntervalRef.current) {
         clearInterval(quoteIntervalRef.current);
@@ -103,10 +114,10 @@ export default function StudySmartPage(): JSX.Element {
   };
 
   const handleFormSubmit = async (values: DocumentInputFormValues) => {
-    // Reset previous data
     setFlashcardsData(null);
     setQuizData(null);
     setDocumentTopicSummaries(null);
+    setDocumentFullTextForAI(null);
     
     setCurrentStep("loading"); 
     
@@ -128,6 +139,7 @@ export default function StudySmartPage(): JSX.Element {
 
         const allBulletPoints = summaryResult.topicSummaries.flatMap(ts => ts.bulletPoints);
         const textForProcessing = allBulletPoints.join("\n"); 
+        setDocumentFullTextForAI(textForProcessing); // Save for Ask Question feature
         
         if (textForProcessing.length < 50) { 
              toast({ title: "Info", description: "The document content after summarization is very short. Generated study aids might be limited." });
@@ -200,6 +212,7 @@ export default function StudySmartPage(): JSX.Element {
     setFlashcardsData(null);
     setQuizData(null);
     setDocumentTopicSummaries(null);
+    setDocumentFullTextForAI(null);
     setStudyResults(null);
     setCurrentStep("input");
     toast({ title: "Ready for a new document!", description: "Upload another PDF to continue learning." });
@@ -207,6 +220,8 @@ export default function StudySmartPage(): JSX.Element {
 
   const renderStepContent = () => {
     switch (currentStep) {
+      case "preloading":
+        return <Preloader />;
       case "introduction":
         return <IntroductionPage onSubmit={handleIntroductionSubmit} />;
       case "input":
@@ -217,13 +232,13 @@ export default function StudySmartPage(): JSX.Element {
             <LoadingSpinner size="lg" />
             {motivationalQuote && (
               <p 
-                key={quoteKey} // Key to re-trigger animation on change
+                key={quoteKey} 
                 className="mt-6 text-lg text-muted-foreground italic animate-shake min-h-[50px] flex items-center justify-center"
               >
                 &ldquo;{motivationalQuote}&rdquo;
               </p>
             )}
-             {!motivationalQuote && <div className="mt-6 min-h-[50px]"></div>} {/* Placeholder for consistent layout */}
+             {!motivationalQuote && <div className="mt-6 min-h-[50px]"></div>} 
           </div>
         );
       case "dashboard":
@@ -232,6 +247,7 @@ export default function StudySmartPage(): JSX.Element {
             onStartFlashcards={() => setCurrentStep("flashcards")}
             onStartQuiz={() => setCurrentStep("quiz")}
             onStartNotes={() => setCurrentStep("notes")} 
+            onStartAskQuestion={() => setCurrentStep("askQuestion")} // New prop
             onUploadAnother={handleUploadAnotherDocument}
             hasFlashcards={!!flashcardsData && flashcardsData.length > 0}
             hasQuiz={!!quizData && quizData.length > 0}
@@ -261,6 +277,11 @@ export default function StudySmartPage(): JSX.Element {
                   onComplete={handleQuizComplete} 
                   onExit={() => setCurrentStep("dashboard")} 
                   onIncrementPoints={handleIncrementGlobalPoints}
+                />;
+      case "askQuestion": // New case
+        return <AskQuestionView 
+                  documentText={documentFullTextForAI} 
+                  onExit={() => setCurrentStep("dashboard")} 
                 />;
       case "notes":
         return <NotesEditor onExit={() => setCurrentStep("dashboard")} />;
