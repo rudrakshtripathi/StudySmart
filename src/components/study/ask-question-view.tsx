@@ -65,7 +65,7 @@ export function AskQuestionView({ documentText, onExit }: AskQuestionViewProps):
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto shadow-xl animate-pop-in flex flex-col h-[calc(100vh-12rem)]"> {/* Adjusted height */}
+    <Card className="w-full max-w-3xl mx-auto shadow-xl animate-pop-in flex flex-col h-[500px] sm:h-[550px] md:h-[600px] lg:h-[650px] max-h-[85vh]">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-2xl flex items-center gap-2">
@@ -133,3 +133,4 @@ export function AskQuestionView({ documentText, onExit }: AskQuestionViewProps):
     </Card>
   );
 }
+
